@@ -92,10 +92,10 @@
         .topRightCircle{
             /* Upper Right Corner */
             position: absolute;
-            width: 225px;
-            height: 225px;
-            left: 1100px;
-            top: -49px;
+            width:400px;
+            height: 400px;
+            left: -25x;
+            top: 550px;
             border-radius: 50%;
         
             background: rgba(229, 252, 194, 0.78);
@@ -107,13 +107,13 @@
             position: absolute;
             width: 414px;
             height: 414px;
-            left: 900px;
-            top: 400px;
+            left: 1000px;
+            top: 375px;
             border-radius: 50%;
         
             background: rgba(229, 252, 194, 0.3);
         }
-        
+
         img{
             /* Robot Laptop 1 */
             position: absolute;
