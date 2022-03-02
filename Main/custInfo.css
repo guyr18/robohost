@@ -43,6 +43,15 @@
             margin: -10px;
         }
         
+        .alert {
+            text-align: center;
+            padding: 10px;
+            color: white;
+            margin-bottom: 10px;
+            display: none;
+              
+          }
+
         input[type=text], select {
         display: inline-block;
         width: 100%;
