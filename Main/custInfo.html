@@ -17,16 +17,20 @@
 <div class="topRightCircle"></div>
 <div class="bottomRightCircle"></div>
 
+
 <div class="info">
-    <form action="/action_page.php">
-      <label for="fname">First Name</label>
-      <input type="text" id="fname" name="firstname" placeholder="Your name..">
-  
-      <label for="pnumber">Phone Number</label>
-      <input type="text" id="pnumber" name="phoneNum" placeholder="Your phone number..">
-  
-      <label for="partySize">Your party size</label>
+    <form action="" method="POST" id="waitListForm">
+      
+      <label class ="" for="name">Name:</label>
+      <input type="text" name="name" value="" id="name" placeholder= "Your Name... " required />
+
+      <label class ="" for="pnumber">Phone Number:</label>
+      <input type="text" name="pnumber" value="" id="pnumber" placeholder= "Your phone number.. " required />
+
+
+      <label class="" for="partySize">Party size:</label>
       <select id="partySize" name="partySize">
+
         <option value="one">1</option>
         <option value="two">2</option>
         <option value="three">3</option>
@@ -37,6 +41,8 @@
       </select>
     
       <input type="submit" value="Submit">
+
+      <div class="alert">Submitted!</div>
     </form>
   </div>
 </body>
