@@ -1,17 +1,40 @@
-<!--how to use application-->
 <!DOCTYPE HTML>
 <!--how to use web page  part of the RoboHost application-->
 <html>
 	<head>
 		<title>How to Use - RoboHost</title>
 		
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 		<!--How to page uses the how to stylesheet-->
 		<link rel="stylesheet" href="howTo.css">
 	</head>
 	<body>
-		<!--Return Back to Employee View-->
-		<a href="employeeView.html"><button class="Return_Emp_View">Home</button></a>
-		
+		<div id="myMenu" class="MenuLayer">
+            <a href="javascript:void(0)" class="closeMenuButton" onclick="toggleNav()"></a>
+            <div class="MenuLayerLinks">
+                <a href="howTo.html">How To Use</a>
+                <a href="yourTables.html">Your Tables</a>
+                <a href="#">Logout</a>
+                <a href="employeeView.html">Employee View</a>
+                <a > Employee: </a>
+            </div>
+
+            <script>
+
+            function toggleNav() {
+                var element = document.getElementById("myMenu");
+                if (element.style.width == "250px") {
+                    element.style.width = "0px";
+                } else {
+                    element.style.width = "250px";
+                }
+            }
+            </script>
+        </div>
 		<!--The display title of the site-->
 		<h1>HOW TO USE</h1>
 		
@@ -34,5 +57,8 @@
 				</p>
 			</div>
 		</div>
+		<div class="hamburgerButton">
+            <img src="pics/hambutton.png" alt="Hamburger Button" width="60" height="35" onclick="toggleNav()">
+        </div>
 	</body>
 </html>
