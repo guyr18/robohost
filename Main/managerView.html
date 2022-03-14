@@ -17,13 +17,13 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
         <script> 
-        function addTable(layer, stage){
+        function addTable(){
             var scale = Math.random();
 
             var rectX = stage.width() / 2 - 50;
             var rectY = stage.height() / 2 - 25;
 
-            var table = new Konva.table({
+            var table = new Konva.Rect({
                 
                 x: rectX,
                 y: rectY,
@@ -34,8 +34,15 @@
                 strokeWidth: 4,
                 draggable: true,
             });
+            console.log("I am in function")
             layer.add(table);
-            }
+
+        }
+        function removeTable(table, layer){
+            delete this.table;
+            delete this.layer;
+            console.log("Delete is working")
+        }    
         </script>
         <div id="myMenu" class="MenuLayer">
             <a href="javascript:void(0)" class="closeMenuButton" onclick="toggleNav()"></a>
@@ -60,8 +67,11 @@
     <body>
 
         <div class="rectangle">
+            
             <div>
+                
                 <div id="container"></div>
+        
                 <script>
                 var width = window.innerWidth;
                 var height = window.innerHeight;
@@ -75,7 +85,6 @@
                 var layer = new Konva.Layer();
                 var rectX = stage.width() / 2 - 50;
                 var rectY = stage.height() / 2 - 25;
-            
                 var box = new Konva.Rect({
                     x: rectX,
                     y: rectY,
@@ -86,19 +95,15 @@
                     strokeWidth: 4,
                     draggable: true,
                 });
-                // add cursor styling
-                box.on('mouseover', function () {
-                    document.body.style.cursor = 'pointer';
-                  });
-                box.on('mouseout', function () {
-                    document.body.style.cursor = 'default';
-                });
+
+
                 layer.add(box);
                 stage.add(layer);
                 </script>
             </div>
         </div>
-        <button class="Button" onclick="addTable">Add A Table</button>
+        <button class="Button" onclick="addTable()">Add A Table</button>
+        <button class="Button" onclick="removeTable()">Remove A Table</button>
         <div class="hamburgerButton">
             <img src="pics/hambutton.png" alt="Hamburger Button" width="60" height="35" onclick="toggleNav()">
         </div>
