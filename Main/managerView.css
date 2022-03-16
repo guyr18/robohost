@@ -189,12 +189,14 @@ transition: 0.3s;
 
 .Button
 {
-    position: absolute;
+    position: relative;
+    padding: 15px;
     width: 100px;
     height: 50px;
     left: 611px;
     top: 717px;
     font-size: 12px;
+    text-align: center;
 
     background: #9DE0AD;
     border: 1px solid #E5FCC2;
