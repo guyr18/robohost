@@ -1,0 +1,185 @@
+<!--employyee login-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles/empLogin.css') }}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/mgalante/jquery.redirect@master/jquery.redirect.js"></script>
+        <title>Employee Login</title>
+        <meta charset="UTF-8">
+    </head>
+    
+    <!-- Script for Python communication -->
+    <script type="text/javascript">
+
+
+          // Check that user has correct cookies to access this page.
+
+        function getCookie(cname) 
+        {
+
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+
+            for(let i = 0; i <ca.length; i++)
+            {
+
+                let c = ca[i];
+
+                while (c.charAt(0) == ' ') 
+                {
+
+                    c = c.substring(1);
+                }
+
+                if (c.indexOf(name) == 0) 
+                {
+
+                    return c.substring(name.length, c.length);
+
+                }
+            }
+
+            return "";
+
+        }
+
+        // https://www.w3schools.com/js/js_cookies.asp
+        function setCookie(cname, cvalue, exdays) 
+        {
+
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            let expires = "expires="+ d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+
+        }
+
+        // If either is missing, this user does not belong on this web page.
+
+        const lvl = getCookie("accessLevel");
+
+        // Is the user already logged in? If so, redirect them to the appropriate view.
+        if(getCookie("strName") != "" && lvl != "")
+        {
+
+            let target = "";
+
+            if(lvl == "0")
+            {
+
+                target = "/cview";
+
+            }
+            else if(lvl == "1")
+            {
+
+                target = "/eview";
+
+            }
+            else
+            {
+                
+                target = "/mview";
+
+            }
+
+            $.redirect(target, {});
+
+        }
+        
+
+        function authLogin()
+        {
+
+
+            fetch('/auth_login', {
+
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            method: 'POST',
+
+            body: JSON.stringify({
+                "username": document.querySelector("input[name=usr]").value,
+                "password": document.querySelector("input[name=pwd]").value,
+            })
+
+            }).then(function (response) { 
+                return response.json();
+
+            }).then(function (data) {
+
+                console.log(data);
+                console.log(data.msg);
+                let parent = document.querySelector(".errorMsg");
+                parent.innerHTML = data.msg;
+                parent.style.color = data.success == 0 ? 'red' : 'green';
+                parent.style.paddingLeft = data.success == 0 ? "536px" : "583px";
+
+                // If login successful, do this:
+                if(data.success == 1)
+                {
+
+
+                    /* Access level(s): 0 => Customer
+                                        1 => Employee
+                                        2 => Manager
+
+                       Update target variable and redirect accordingly.
+
+                    */
+
+                    // Setting cookie will allow us to prevent unauthorized get requests
+                    // to the view pages.
+                    setCookie("strName", data.strName, 1)
+                    setCookie("accessLevel", data.accessLevel, 1)
+                    let target = "";
+
+                    if(data.accessLevel == 0)
+                    {
+
+                        target = "/cview";
+
+                    }
+                    else if(data.accessLevel == 1)
+                    {
+
+                        target = "/eview";
+
+                    }
+                    else
+                    {
+
+                        target = "/mview";
+
+                    }
+
+                    $.redirect(target, data);
+
+                }
+
+                return data.msg;
+
+            });
+        }
+
+    </script>
+
+    <body>
+        <h1 class="empWelcome">Welcome Employee</h1>
+        <p class="plsLog">Please enter your login information</p>
+        <p class="usernameTxt">Username:</p>
+        <input name="usr" class="usernameBox" />
+        <p class="passwordTxt">Password:</p>
+        <input name="pwd" class="passwordBox"></input>
+        <p class="errorMsg"><b></b></p>
+        <button onclick="authLogin()" class="loginBox">Log in</button>
+        <div class="topLeftCircle"></div>
+        <img src="{{ url_for('static',filename='images/RobotLaptop.png') }}">
+        <div class="topRightCircle"></div>
+        <div class="bottomRightCircle"></div>
+    </body>
+</html>

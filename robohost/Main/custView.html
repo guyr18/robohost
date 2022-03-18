@@ -1,0 +1,62 @@
+<!--check in button for customer to press-->
+<!DOCTYPE html>
+<html>
+    <title>Welcome!</title>
+    <head>
+        <link rel = "stylesheet" href = "{{ url_for('static',filename='styles/custView.css') }}">
+    </head>
+    <body>
+        <script>
+
+             // Check that user has correct cookies to access this page.
+
+        function getCookie(cname) 
+        {
+
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+
+            for(let i = 0; i <ca.length; i++)
+            {
+
+                let c = ca[i];
+
+                while (c.charAt(0) == ' ') 
+                {
+
+                    c = c.substring(1);
+                }
+
+                if (c.indexOf(name) == 0) 
+                {
+
+                    return c.substring(name.length, c.length);
+
+                }
+            }
+
+            return "";
+
+        }
+
+        // If either is missing, this user does not belong on this web page.
+
+        if(getCookie("strName") == "" || getCookie("accessLevel") != "0")
+        {
+
+            location.href = "employeeLogin";
+
+        }
+        
+        </script>
+        <h1>Welcome, Customer!</h1>
+        <h3 class = "inst">Please check in to proceed.</h3>
+        <img class = "roboImg" src = "{{ url_for('static',filename='images/roboMonitor.png') }}"">
+        <a href = "/custInfo" style = "text-decoration: none;"><button class = "checkInButton">Check In</button></a>
+        <!--Add Robo Image Here-->
+        <div class = "circle1"></div>
+        <div class = "circle2"></div>
+        <div class = "circle3"></div>
+    </body>
+</html>

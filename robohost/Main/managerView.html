@@ -1,0 +1,589 @@
+<!-- Manager View page-->
+
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>
+            Manager View
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles/managerView.css') }}">
+        <script src="https://unpkg.com/konva@8.3.3/konva.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+        <script> 
+
+        var tables = {}; // Table reference cache.
+        var objTableData = {}; // Table data cache.
+        var selectedTableKey = null; // Currently selected data key.
+        var tableCount = 0; // Running counter of tables; 
+        var tailTable = null; // Last table added to tables.
+        var stage = null; // Reference to root layer used by Konva.
+        var globalLayer = new Konva.Layer(); // Globalized layer to avoid excessive layer creation.
+
+        // Color map for assigning table colors.
+        var colorStateMap = {"Idle": "#5FAAF0", "default": "#5FAAF0", "Available": "#9FE15C", "In Use": "#C4C4C4", "Needs to Be Cleaned": "#F16464"};
+
+
+        function getCookie(cname) 
+        {
+
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+
+            for(let i = 0; i < ca.length; i++)
+            {
+
+                let c = ca[i];
+
+                while (c.charAt(0) == ' ') 
+                {
+
+                    c = c.substring(1);
+                }
+
+                if (c.indexOf(name) == 0) 
+                {
+
+                    return c.substring(name.length, c.length);
+
+                }
+            }
+
+            return "";
+
+        }
+
+        function deleteCookie(cname) 
+        {
+
+            document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        }
+
+        function logout()
+        {
+
+            deleteCookie("strName");
+
+        }
+
+        // If either is missing, this user does not belong on this web page.
+        if(getCookie("strName") == "" || getCookie("accessLevel") == "")
+        {
+
+            location.href = "employeeLogin";
+
+        }
+  
+        function fillTables(src)
+        {
+
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            stage = new Konva.Stage({
+
+                container: "container",
+                width: windowWidth,
+                height: windowHeight,
+
+            });
+
+            const itemsPerRow = 5; 
+            const usedRows = Math.ceil(src.length / itemsPerRow);
+            let slotsLeft = src.length;
+            
+            for(let i = 0; i < usedRows; i++)
+            {
+
+               
+                const colLimit = slotsLeft > 5 ? 5 : slotsLeft;
+                let prevBox = null;
+
+                for(let j = 0; j < colLimit; j++, tableCount++)
+                {
+
+                    const posX = j == 0 ? 100 : prevBox.position().x + 200;
+                    const posY = i * 100;
+                    
+                    let box = new Konva.Group({
+
+                        name: src[i * itemsPerRow + j].tableId,
+                        x: posX,
+                        y: posY,
+                        width: 100,
+                        height: 50,
+                        draggable: true,
+
+                    });
+
+                    var surface = new Konva.Rect({
+
+                        width: 100,
+                        height: 50,
+                        fill: "#00D2FF",
+                        stroke: "black",
+                        strokeWidth: 4,
+
+                    });
+
+                    box.add(surface);
+                    box.add(new Konva.Text({
+
+                        text: box.name(),
+                        fontSize: 18,
+                        fill: "#000",
+                        align: 'center',
+                        width: 75,
+                        padding: 20,
+                        x: 12,
+
+                    }));
+
+                    surface.fill(colorStateMap[objTableData[box.name()].strState]);
+                    box.on("click", () => {
+
+                        showTableProps(box.name());
+
+                    });
+
+                    prevBox = box;
+                    tables[src[i * itemsPerRow + j].tableId] = box;
+                    globalLayer.add(box);
+                    stage.add(globalLayer);
+
+                    if(i == usedRows - 1 && j == colLimit - 1) { tailTable = box; }
+
+                }
+
+                slotsLeft -= colLimit;
+
+            }
+        }
+
+
+        function showTableModal(key)
+        {
+
+            console.log("showTableModal()");
+            $('.modeSection').show();
+
+        }
+
+        function showTableProps(key)
+        {
+
+            console.log("showTableProps()");
+            selectedTableKey = key;
+            $('.propText').text(() => {
+                
+                return ("Currently viewing Table [ID = " + key.toString() + "]");
+
+            });
+
+            let curState = objTableData[key].strState;
+
+            if(curState == "default")
+            {
+
+                curState = "Idle";
+
+            }
+
+            let filter = 'select option[value="' + curState + '"]';
+            console.log(filter);
+            $('.tableInfo').show();
+            $('option:selected').attr('selected', false);
+            $(filter).attr("selected",true);
+            $('.vnsInput').val(objTableData[key].numSeats.toString());
+            $('.suidInput').val(objTableData[key].sectionUid.toString());
+
+        }
+
+        function updateTablePos(key, x, y)
+        {
+
+            console.log("Updating table position for key => " + key);
+
+            if(tables[key] != null)
+            {
+
+                tables[key].position({x: x, y: y});
+           
+            }
+        }
+
+        function addTable(tableId)
+        {
+
+            if(tableCount == 25)
+            {
+
+                console.log("Max tables reached, can\'t add anymore.");
+                return;
+
+            }
+
+            // Conditionals indicate: does adding a new item require a new row? If so,
+            // offset coordinates accordingly.
+            console.log("tableCount => " + tableCount);
+            const itemsPerRow = 5;
+            const posX = (tableCount + 1) % itemsPerRow == 1 ? 100 : tailTable.position().x + 200;
+            const posY = (tableCount + 1) % itemsPerRow == 1 ? tailTable.position().y + 100 : tailTable.position().y;
+
+            let box = new Konva.Group({
+                
+                name: tableId.toString(),
+                x: posX,
+                y: posY,
+                width: 100,
+                height: 50,
+                draggable: true,
+
+            });
+
+            var surface = new Konva.Rect({
+
+                width: 100,
+                height: 50,
+                fill: '#00D2FF',
+                stroke: 'black',
+                strokeWidth: 4,
+
+            });
+
+            box.add(surface);
+            box.add(new Konva.Text({
+
+                text: box.name(),
+                fontSize: 18,
+                fill: "#000",
+                align: 'center',
+                width: 75,
+                padding: 20,
+                x: 12,
+
+            }));
+
+            surface.fill(colorStateMap[objTableData[box.name()].strState]);
+            box.on("click", () => {
+
+                showTableProps(box.name());
+
+            });
+
+            tableCount++;
+            tailTable = box;
+            tailTable.position({x: posX, y: posY});
+            tables[tableId] = box;
+            globalLayer.add(box);
+            stage.add(globalLayer);
+                
+        }
+
+        </script>
+        <div id="myMenu" class="MenuLayer">
+            <a href="javascript:void(0)" class="closeMenuButton" onclick="toggleNav()"></a>
+            <div class="MenuLayerLinks">
+                <a href="/howTo">How To Use</a>
+                <a href="/yourTables">Your Tables</a>
+                <a href="/employeeLogin" onclick="logout()">Logout</a>
+                <p class="employeeText">Employee: </p>
+            </div>
+            <script>
+            function toggleNav() {
+                var element = document.getElementById("myMenu");
+                if (element.style.width == "250px") {
+                    element.style.width = "0px";
+                } else {
+                    element.style.width = "250px";
+                }
+            }
+
+            $(document).ready(() => {
+
+
+                $(".employeeText").text(() => {
+                
+                    return "Employee: " + getCookie("strName");
+
+                });
+            
+                $('input:radio[name=add]').prop('checked', true);
+                $('.remSection').hide();
+                $('.tableInfo').hide();
+
+                fetch('/data_handler', {
+
+                headers: {
+
+                    'Content-Type': 'application/json'
+
+                },
+
+                method: 'POST',
+                
+                body: JSON.stringify({
+
+                    "intType": 0
+
+                })
+
+                }).then(function (response) {
+
+                    return response.json();
+
+                }).then(function (data) {
+
+                    return data.src;
+
+                }).then(function (tableData) {
+
+                    for(key in tableData)
+                    {
+
+                        const useKey = tableData[key].tableId.toString();
+                        objTableData[useKey] = {strState: "", numSeats: -1, sectionUid: -1};
+                        objTableData[useKey].strState = tableData[key].strState;
+                        objTableData[useKey].numSeats = tableData[key].numSeats;
+                        objTableData[useKey].sectionUid = tableData[key].sectionUid;
+
+                    }
+
+                    fillTables(tableData);
+
+                });
+
+                $('.confirmBtn').click(() => {
+
+                    console.log("Add table clicked");
+                    let tableId = $('.numInput').val();
+                    let numSeats = $('.seatInput').val();
+                    let sectId = $('.sectInput').val();
+                    console.log("tableId => " + tableId);
+                    console.log("numSeats => " + numSeats);
+                    console.log("sectId => " + sectId);
+
+                    fetch('/add_table', {
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                        },
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+                            "tableId": tableId,
+                            "numSeats": numSeats,
+                            "sectionUid": sectId,
+                            "strState": "default",
+                    })
+
+                    }).then(function (response) { 
+                        return response.json();
+
+                    }).then(function (data) {
+
+                        addTable(tableId, tables, new Konva.Layer());
+                        $('.numInput').val($('.numInput').prop('placeholder'));
+                        $('.seatInput').val($('.seatInput').prop('placeholder'));
+                        $('.sectInput').val($('.sectInput').prop('placeholder'));
+
+                    });
+                });
+
+                $('.confirmRemBtn').click(() => {
+
+                    let tableId = $('.remId').val();
+
+                    fetch('/remove_table', {
+
+                    headers: {
+
+                        'Content-Type': 'application/json',
+                    
+                    },
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+
+                        "tableId": tableId,
+
+                    })
+
+                    }).then(function (response) {
+
+                        return response.json();
+
+                    }).then(function (data) {
+
+                        let code = data.code;
+
+                        if(code == 0)
+                        {
+
+                            console.log("Invalid table ID specified");
+
+                        }
+                        else
+                        {
+
+                            console.log("Table deleted successfully.");
+                            $('.remId').val($('.remId').prop('placeholder'));
+
+                            // Find new tail table
+                            if(tailTable.name() == tableId.toString())
+                            {
+
+                                const n = tableCount;
+                                const onDiffRow = (n - 1) % 5 == 0;
+                                console.log(n);
+
+                                for(key in tables)
+                                {
+
+                                    const xMatch = !onDiffRow ? tables[key].position().x == tailTable.position().x - 200 : tables[key].position().x == 900;
+                                    const yMatch = !onDiffRow ? tables[key].position().y == tailTable.position().y : tables[key].position().y == (Math.ceil((n - 1) / 5) * 100) - 100;
+
+                                    if(xMatch && yMatch)
+                                    {
+
+                                        tailTable = tables[key];
+                                        break;
+
+                                    }
+                                }
+                            }
+
+                            // Destroy and deallocate removed table.
+                            tableCount--;
+                            tables[tableId].destroy();
+                            delete tables[tableId];
+
+                        }
+
+                    });
+                });
+
+                $('input:radio').change(function() {
+
+                    if(this.name == "add")
+                    {
+
+                        $('input:radio[name=sub]').prop('checked', false);
+                        console.log("add clicked");
+                        $('.remSection').hide();
+                        $('.inputSection').show();
+
+                    }
+                    else
+                    {
+
+                        console.log("remove clicked");
+                        $('input:radio[name=add]').prop('checked', false);
+                        $('.inputSection').hide();
+                        $('.remSection').show();
+
+                    }
+                });
+
+                $('.updBtn').click(() => {
+
+                    fetch('/data_handler', {
+
+                    headers: {
+
+                        'Content-Type': 'application/json',
+
+                    },
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+
+                        "intType": 1,
+                        "tableId": selectedTableKey,
+                        "newState": $('.stateInputProp option:selected').val(),
+
+                    })
+
+                    }).then(function (response) {
+
+                        return response.json();
+
+                    }).then(function (data) {
+
+                        console.log(data.resp);
+                        console.log(data.newState);
+                        let surface = tables[selectedTableKey].getChildren()[0];
+                        surface.fill(colorStateMap[data.newState]);
+                        objTableData[selectedTableKey].strState = data.newState;
+                        
+                    });
+                });
+            });
+            
+
+            </script>
+        </div>
+    </head>
+    <body>
+
+        <div class="rectangle">
+            <div>
+                <div id="container"></div>
+                <div class="tableModal">
+                    <div class="tableHeader">
+                        <p class="statusText">Table Manager</p>
+                        <div class="modeSection">
+                            <p class="modeText">Select a Mode of Operation</p>
+                            <label class="addOp">Add Table</label><input class="radioAdd" name="add" type="radio" />
+                            <label class="remOp">Remove Table</label><input class="radioRem" name="sub" type="radio" />
+                        </div>
+                        <div class="inputSection">
+                            <label class="numText">Table No.<input class="numInput" type="text" placeholder="Enter Table No." /></label>
+                            <label class="numSeats">No. of Seats<input class="seatInput" type="text" placeholder="Enter No. of Seats " /></label>
+                            <label class="numSections">Section UID<input class="sectInput" type="text" placeholder="Enter Section Identifier" /></label>
+                            <input type="button" class="confirmBtn" value="Add" />
+                        </div>
+                        <div class="remSection">
+                            <label class="remTableNo">Table No.</label><input class="remId" type="text" placeholder="Enter Table No. to Remove" />
+                            <input type="button" class="confirmRemBtn" value="Remove" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tablePropertyModal">
+                    <p class="propText">No Table Currently Selected.</p>
+                    <div class="tableInfo">
+                        <label class="infoState">
+                            <label for="stateInputProp">State:</label>
+                            <select class="stateInputProp">
+                                <option value="Idle">Idle</option>
+                                <option value="In Use">In Use</option>
+                                <option value="Available">Available</option>
+                                <option value="Needs to Be Cleaned">Needs to Be Cleaned</option>
+                            </select>
+                            <button class="updBtn">
+                                <p class="updTxt">Update</p>
+                            </button>
+                        </label>
+                        <label class="viewNumSeats">No. of Seats</label><input class="vnsInput" type="text" value="" /> 
+                        <label class="viewSUID">Section UID</label><input class="suidInput" type="text" value="" /> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hamburgerButton">
+            <img src="{{ url_for('static',filename='images/hambutton.png') }}" alt="Hamburger Button" width="60" height="35" onclick="toggleNav()">
+        </div>
+    </body>
+</html>
