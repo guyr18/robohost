@@ -233,7 +233,6 @@
 
             // Conditionals indicate: does adding a new item require a new row? If so,
             // offset coordinates accordingly.
-            console.log("tableCount => " + tableCount);
             const itemsPerRow = 5;
             const posX = (tableCount + 1) % itemsPerRow == 1 ? 100 : tailTable.position().x + 200;
             const posY = (tableCount + 1) % itemsPerRow == 1 ? tailTable.position().y + 100 : tailTable.position().y;
@@ -367,10 +366,7 @@
                     let tableId = $('.numInput').val();
                     let numSeats = $('.seatInput').val();
                     let sectId = $('.sectInput').val();
-                    console.log("tableId => " + tableId);
-                    console.log("numSeats => " + numSeats);
-                    console.log("sectId => " + sectId);
-
+                    let newState = $('.addSectStateInput option:selected').val();
                     fetch('/add_table', {
 
                     headers: {
@@ -383,7 +379,7 @@
                             "tableId": tableId,
                             "numSeats": numSeats,
                             "sectionUid": sectId,
-                            "strState": "default",
+                            "strState": newState,
                     })
 
                     }).then(function (response) { 
@@ -391,6 +387,7 @@
 
                     }).then(function (data) {
 
+                        objTableData[tableId] = {strState: newState, sectionUid: sectId, numSeats: numSeats};
                         addTable(tableId, tables, new Konva.Layer());
                         $('.numInput').val($('.numInput').prop('placeholder'));
                         $('.seatInput').val($('.seatInput').prop('placeholder'));
@@ -552,6 +549,13 @@
                             <label class="numText">Table No.<input class="numInput" type="text" placeholder="Enter Table No." /></label>
                             <label class="numSeats">No. of Seats<input class="seatInput" type="text" placeholder="Enter No. of Seats " /></label>
                             <label class="numSections">Section UID<input class="sectInput" type="text" placeholder="Enter Section Identifier" /></label>
+                            <label for="addSectStateInput">Table State</label>
+                                <select class="addSectStateInput">
+                                    <option value="Idle">Idle</option>
+                                    <option value="In Use">In Use</option>
+                                    <option value="Available">Available</option>
+                                    <option value="Needs to Be Cleaned">Needs to Be Cleaned</option>
+                                </select>
                             <input type="button" class="confirmBtn" value="Add" />
                         </div>
                         <div class="remSection">

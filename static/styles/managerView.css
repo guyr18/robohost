@@ -96,10 +96,32 @@ input.radioRem {
     left: -38px;
 }
 
+select.addSectStateInput {
+
+    position: absolute;
+    width: 200px;
+    height: 22px;
+    top: 120px;
+    right: 50px;
+    border-radius: 12px;
+    background: #FFF;
+    text-align: center;
+    color: #8b8b8b;
+}
+
+label[for=addSectStateInput] {
+
+    position: absolute;
+    top: 122px;
+    right: 238px;
+    width: 100px;
+
+}
+
 div.tableModal {
 
     width: 350px;
-    height: 340px;
+    height: 400px;
     background: #8b8b8b;
     border-color: #000000;
     border-width:  3px;
@@ -118,7 +140,7 @@ div.tableModal {
     background: #00D2FF;
     border-color: #000000;
     border-width: 3px;
-    top: 32px;
+    top: 76px;
     left: 110px;
 
 }
