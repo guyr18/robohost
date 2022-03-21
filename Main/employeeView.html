@@ -21,6 +21,16 @@
                 position: relative;
             }
 
+            h3
+            {
+                color: rgb(235, 235, 235);
+                background: radial-gradient(circle, #000000, 500px);
+                position: center;
+                background-clip:padding-box;
+                background-size: 100%;
+                background-image: #000000;
+            }
+
             
             .rectangle{
                 position:absolute;
@@ -29,8 +39,9 @@
                 left: 120px;
                 top: 110px;
 
-                background: #DDDDDD;
+                background: #8b8b8b;
                 border: 1.5px solid #000000;
+                border-radius: 10px;
                 box-sizing: border-box;
             }
 
@@ -57,14 +68,24 @@
                 width: 176px;
                 height: 94px;
                 padding: 35px;
-                background: #5FAAF0;
-                border: 1px solid #000000;
+                background: linear-gradient(to bottom, #3b9af3, #5FAAF0, #87bdf0);
+                border: .1px solid #000000;
                 box-sizing: border-box;
                 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
                 border-radius: 25px;
                 text-align: center;
                 margin: 10px 15px;
                 float: left;
+            }
+
+            .TablesQueue .TextGradientBlue
+            {
+                background: linear-gradient(to bottom,#87bdf0, #3b9af3);
+                border-radius: 50px;
+                margin-left: 14px;
+                margin-right: 14px;
+                height: 80px;
+                margin-top: -55px;
             }
 
             .TablesBusy
@@ -72,31 +93,50 @@
                 width: 176px;
                 height: 94px;
                 padding: 35px;
-                background: #F16464;
-                border: 1px solid #000000;
+                background: linear-gradient(to bottom, #f05151, #f36969, #f07b7b);
+                border: .1px solid #000000;
                 box-sizing: border-box;
                 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
                 border-radius: 25px;
                 text-align: center;
                 margin: 10px 15px;
                 float: left;
-                cursor: pointer;
-                
-
+                cursor: pointer;                
             }
+
+            .TablesBusy .TextGradientRed
+            {
+                background: linear-gradient(to bottom,#f07b7b, #f05151);
+                border-radius: 50px;
+                margin-left: 14px;
+                margin-right: 14px;
+                height: 80px;
+                margin-top: -55px;
+            }
+            
             .TablesInUse
             {
                 width: 176px;
                 height: 94px;
                 padding: 35px;
-                background: #C4C4C4;
-                border: 1px solid #000000;
+                background: linear-gradient(to bottom, #979797, #C4C4C4, #dbdbdb);
+                border: .1px solid #000000;
                 box-sizing: border-box;
                 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
                 border-radius: 25px;
                 text-align: center;
                 margin: 10px 15px;
                 float: left;
+            }
+
+            .TablesInUse .TextGradientGrey
+            {
+                background: linear-gradient(to bottom,#dbdbdb, #979797);
+                border-radius: 50px;
+                margin-left: 14px;
+                margin-right: 14px;
+                height: 80px;
+                margin-top: -55px;
             }
 
             .TablesReady
@@ -104,8 +144,8 @@
                 width: 176px;
                 height: 94px;
                 padding: 35px;
-                background: #9FE15C;
-                border: 1px solid #000000;
+                background: linear-gradient(to bottom, #76bd2f, #9FE15C, #a9e76c);
+                border: .1px solid #000000;
                 box-sizing: border-box;
                 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
                 border-radius: 25px;
@@ -113,6 +153,16 @@
                 margin: 10px 15px;
                 float: left;
                 cursor: pointer;
+            }
+
+            .TablesReady .TextGradientGreen
+            {
+                background: linear-gradient(to bottom,#a9e76c, #76bd2f);
+                border-radius: 50px;
+                margin-left: 14px;
+                margin-right: 14px;
+                height: 80px;
+                margin-top: -55px;
             }
 
             .MenuLayer
@@ -178,26 +228,26 @@
         </div>
         <div class="rectangle">
             <div>
-                <p class="TablesQueue"> Table 1 </p>
-                <p class="TablesBusy"> Table 2 </p>
-                <p class="TablesInUse"> Table 3 </p>
-                <p class="TablesReady"> Table 4 </p>
-                <p class="TablesInUse"> Table 5 </p>
-                <p class="TablesReady"> Table 6 </p>
-                <p class="TablesReady"> Table 7 </p>
-                <p class="TablesInUse"> Table 8 </p>
-                <p class="TablesQueue"> Table 9 </p>
-                <p class="TablesReady" id="YourTables"> Table 10 </p>
-                <p class="TablesInUse"> Table 11 </p>
-                <p class="TablesInUse"> Table 12 </p>
-                <p class="TablesInUse"> Table 13 </p>
-                <p class="TablesReady"> Table 14 </p>
-                <p class="TablesInUse"> Table 15 </p>
-                <p class="TablesBusy"> Table 16 </p>
-                <p class="TablesInUse"> Table 17 </p>
-                <p class="TablesInUse"> Table 18 </p>
-                <p class="TablesInUse"> Table 19 </p>
-                <p class="TablesInUse"> Table 20 </p>
+                <h3 class="TablesQueue"> 1 <div class="TextGradientBlue"></div></h3>
+                <h3 class="TablesBusy"> 2 <div class="TextGradientRed"></div></h3>
+                <h3 class="TablesInUse"> 3 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesReady"> 4 <div class="TextGradientGreen"></div></h3>
+                <h3 class="TablesInUse"> 5 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesReady"> 6 <div class="TextGradientGreen"></div></h3>
+                <h3 class="TablesReady"> 7 <div class="TextGradientGreen"></div></h3>
+                <h3 class="TablesInUse"> 8 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesQueue"> 9 <div class="TextGradientBlue"></div></h3>
+                <h3 class="TablesReady"> 10 <div class="TextGradientGreen"></div></h3>
+                <h3 class="TablesInUse"> 11 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesInUse"> 12 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesInUse"> 13 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesReady"> 14 <div class="TextGradientGreen"></div></h3>
+                <h3 class="TablesInUse"> 15 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesBusy"> 16 <div class="TextGradientRed"></div></h3>
+                <h3 class="TablesInUse"> 17 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesInUse"> 18 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesInUse"> 190 <div class="TextGradientGrey"></div></h3>
+                <h3 class="TablesInUse"> 20 <div class="TextGradientGrey"></div></h3>
             </div>
         </div>
 
