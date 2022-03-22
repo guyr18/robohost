@@ -12,8 +12,8 @@
         color: rgba(0, 0, 0, 0.25);
         -webkit-text-stroke: .5px white;
         
-        padding: -20px; 
-        margin: -20px;
+        padding: -30px; 
+        margin: -30px;
         }
 
         body{
@@ -26,7 +26,7 @@
             font-family: Roboto;
             font-style: italic;
             font-weight: 500;
-            font-size: 25px;
+            font-size: 30px;
             line-height: 56px;
             text-align: center;
     
@@ -35,12 +35,15 @@
         }
 
         form{
-            text-align:start;
+            text-align:center;
             color: #FFFFFF;
             height: auto;
             width: auto;
-            padding: -10px;
-            margin: -10px;
+            padding: 10px;
+            margin: 10px;
+            position:absolute; 
+            left:250px; 
+            top:200px;
         }
         
         .alert {
@@ -63,11 +66,11 @@
         box-sizing: border-box;
         }
 
-        input[type=submit] {
+        button {
         
-        width: 100%;
+        width: 30%;
         background-color: #45ADA8;
-        font-size: 20px;
+        font-size: 21px;
         color: #9DE0AD;
         padding: 14px 20px;
         margin: 8px 0;
@@ -76,7 +79,7 @@
         cursor: pointer;
         }
 
-        input[type=submit] {
+        button {
         
         background-color:  #547980;
         }
@@ -105,10 +108,10 @@
         .topRightCircle{
             /* Upper Right Corner */
             position: absolute;
-            width:400px;
-            height: 400px;
-            left: -25x;
-            top: 550px;
+            width:300px;
+            height: 300px;
+            left: 70px;
+            top: 400px;
             border-radius: 50%;
         
             background: rgba(229, 252, 194, 0.78);
@@ -121,7 +124,7 @@
             width: 414px;
             height: 414px;
             left: 1000px;
-            top: 375px;
+            top: 300px;
             border-radius: 50%;
         
             background: rgba(229, 252, 194, 0.3);

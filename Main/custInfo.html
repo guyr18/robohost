@@ -40,10 +40,65 @@
 
       </select>
     
-      <input type="submit" value="Submit">
+      <button id="submit_button" type="button">Submit</button>
 
       <div class="alert">Submitted!</div>
     </form>
   </div>
 </body>
+
+<script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-firestore.js"></script>
+<script type="text/javascript">
+
+
+(function() {
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCO1jpQFRfTuvF6HhFJ6_h5Jidnf2FioE4",
+    authDomain: "robohost-demo.firebaseapp.com",
+    projectId: "robohost-demo",
+    storageBucket: "robohost-demo.appspot.com",
+    messagingSenderId: "726676323212",
+    appId: "1:726676323212:web:40658cad3d927d08f774a9",
+    measurementId: "G-0ZC1969JGH"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  var push_to_firebase = function(data){
+        alert("Submitted")
+        var db = firebase.firestore();
+
+        db.collection("custInfo").add({
+          name: data["name"],
+          phone: data["phone"],
+          partySize: data["partySize"]
+        })
+
+        .then(function(docRef) {
+            console.log("Message sent, ID: ", docRef.id);
+            location.reload();
+        })
+        .catch(function(error) {
+            console.error("Message could not be sent: ", error);
+        });
+      }
+
+      var contact_submit = function(){
+        var name = document.getElementById("name");
+        var phone = document.getElementById("pnumber");
+        var partySize = document.getElementById("partySize");
+
+        var data = {
+          "name": name.value,
+          "phone": phone.value,
+          "partySize": partySize.value
+        }
+        push_to_firebase(data);
+      }
+
+      document.getElementById("submit_button").addEventListener("click", contact_submit);
+    })();
+  </script>
 </html>
