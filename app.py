@@ -1,12 +1,11 @@
-import re
 import firebase_admin
 from firebase_admin import credentials, firestore;
 
-from flask import Flask, jsonify, request, render_template, redirect
-import json
+from flask import Flask, jsonify, request, render_template
+import os
 
 # Initialize Flask
-app = Flask(__name__, template_folder="robohost/Main/")
+app = Flask(__name__, template_folder="public/Main/")
 
 # Initialize Firebase / Firestore
 cred = credentials.Certificate("firebase_private_key.json")
@@ -152,6 +151,11 @@ def auth_login():
         
         return jsonify(objData)
 
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
+def render_index():
+    return render_template('index.html')
+    
 @app.route('/employeeLogin', methods=['GET'])
 def render_login():
     return render_template('employeeLogin.html')
@@ -175,3 +179,6 @@ def render_employee_view():
 @app.route('/mview', methods=['GET', 'POST'])
 def render_manager_view():
     return render_template('managerView.html')
+
+if __name__ == '__main__':
+    app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT', 8080)))

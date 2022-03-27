@@ -1,0 +1,19 @@
+{
+  "name": "robohost_testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.cs.ecu.edu/csci-4230-spring-2022/section-002/electronic-hostess/robohost.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "firebase-tools": "^10.5.0"
+  }
+}
