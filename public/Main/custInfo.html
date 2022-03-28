@@ -4,7 +4,7 @@
 <html>
 
 <head> 
-    <link rel="stylesheet" href="custInfo.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/custInfo.css') }}">
     <title>Customer Check In</title>
     <meta charset="UTF-8">
 </head>
@@ -13,7 +13,7 @@
 <h2>Please fill in your information below to be added to the list!</h2>
 
 <div class="topLeftCircle"></div>
-<img src=pics/RobotLaptop.png>
+<img src="{{ url_for('static',filename='images/RobotLaptop.png') }}">
 <div class="topRightCircle"></div>
 <div class="bottomRightCircle"></div>
 
