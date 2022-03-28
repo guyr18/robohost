@@ -42,8 +42,6 @@
       </select>
     
       <button id="submit_button" type="button">Submit</button>
-
-      <div class="alert">Submitted!</div>
     </form>
   </div>
   
@@ -69,7 +67,6 @@
   firebase.initializeApp(firebaseConfig);
 
   var push_to_firebase = function(data){
-        alert("Submitted")
         var db = firebase.firestore();
 
         db.collection("custInfo").add({
@@ -80,7 +77,8 @@
 
         .then(function(docRef) {
             console.log("Message sent, ID: ", docRef.id);
-            location.reload();
+            location.href = '/custConfirm';
+
         })
         .catch(function(error) {
             console.error("Message could not be sent: ", error);
@@ -97,7 +95,19 @@
           "phone": phone.value,
           "partySize": partySize.value
         }
-        push_to_firebase(data);
+
+        if(name.length > 0 && phone.length > 0)
+        {
+
+          push_to_firebase(data);
+
+        }
+        else
+        {
+
+          alert("Please fill out all available fields!");
+
+        }
       }
 
       document.getElementById("submit_button").addEventListener("click", contact_submit);

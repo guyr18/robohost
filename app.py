@@ -184,5 +184,9 @@ def render_manager_view():
 def render_cust_info():
     return render_template('custInfo.html')
     
+@app.route('/custConfirm', methods=['GET', 'POST'])
+def render_cust_confirm():
+    return render_template('custConfirm.html')
+    
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT', 8080)))
