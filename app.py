@@ -180,5 +180,9 @@ def render_employee_view():
 def render_manager_view():
     return render_template('managerView.html')
 
+@app.route('/custInfo', methods=['GET', 'POST'])
+def render_cust_info():
+    return render_template('custInfo.html')
+    
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT', 8080)))
