@@ -99,7 +99,43 @@
         if(name.value.length > 0 && phone.value.length > 0)
         {
 
-          push_to_firebase(data);
+            var checkIfNumber = (phone) => {
+
+              for(let i = 0; i < phone.value.length; i++)
+              {
+
+                let temp = phone[i];
+
+                if(!isNaN(temp))
+                {
+
+                  continue;
+
+                }
+                else
+                {
+
+                  return false;
+
+                }
+              }
+
+              return true;
+
+            };
+
+            if(!checkIfNumber(phone.value))
+            {
+
+              alert("Please enter a phone number with no special characters (i.e.: 12345678911)");
+
+            }
+            else
+            {
+
+              push_to_firebase(data);
+
+            }
 
         }
         else
