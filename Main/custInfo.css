@@ -18,14 +18,12 @@
 
         body{
             overflow: hidden;
-            margin: 0;
+            margin: 100px 0 0 0;
             background: #45ADA8;
         }
-
-        
         
         h2 {
-        
+            margin: 50px;
             font-family: Roboto;
             font-style: italic;
             font-weight: 500;
@@ -36,15 +34,6 @@
         
             color: #FFFFFF;
         }
-
-        form{
-            text-align:center;
-            color: #FFFFFF;
-            height: auto;
-            width: auto;
-            padding: 10px;
-            margin: 10px;
-        }
         
         .alert {
             text-align: center;
@@ -52,8 +41,7 @@
             color: white;
             margin-bottom: 10px;
             display: none;
-              
-          }
+            }
 
         input[type=text], select {
         display: inline-block;
@@ -67,9 +55,7 @@
         }
 
         button {
-        
         width: 30%;
-        background-color: #45ADA8;
         font-size: 21px;
         color: #9DE0AD;
         padding: 14px 20px;
@@ -77,20 +63,19 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
-        }
-
-        button {
-        
         background-color:  #547980;
         }
 
 
-        .info {
-        width: 600px;
-        margin: auto;
-        border-radius: 7px;
-        background-color: #45ADA8;
-        padding: 10px;
+        form{
+            text-align:center;
+            color: #FFFFFF;
+            height: auto;
+            width: 600px;
+            margin: auto;
+            border-radius: 7px;
+            background-color: #45ADA8;
+            padding: 10px;
         }
 
         .topLeftCircle{
@@ -123,7 +108,7 @@
             position: absolute;
             width: 414px;
             height: 414px;
-            left: 1000px;
+            left: 1100px;
             top: 300px;
             border-radius: 50%;
         
