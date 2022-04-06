@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore;
 
 from flask import Flask, jsonify, request, render_template
+from flask_mail import Mail, Message
 import os
 
 # Initialize Flask
@@ -13,9 +14,14 @@ firebase_admin.initialize_app(cred)
 firestore_db = firestore.client()
 objData = {} # This is the object to send back to JS.
 
-# Type constants
-TYPE_ADD = 0
-TYPE_REMOVE = 1
+# Flask email configuration details
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'robohostnoreply@gmail.com'
+app.config['MAIL_PASSWORD'] = 'Csci4230!'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
 
 @app.route('/data_handler', methods=['POST'])
 def data_handler():
@@ -32,12 +38,24 @@ def data_handler():
             return load_table()
 
         # intType = 1; update state
-        else:
+        elif data['intType'] == 1:
 
             return update_state(data['tableId'], data['newState'])
 
+        # intType = 2; send confirmation email message
+        else:
+            
+            return confirm_email(data['name'], data['email'])
+
         return jsonify(objData)
 
+def confirm_email(name, email):
+ 
+    msg = Message('Robohost - Table Confirmation', sender=app.config['MAIL_USERNAME'], recipients=[email])
+    msg.body = "Hey, " + name + ". Thanks for checking in! Your estimated wait time is <x> minutes and <y> seconds."
+    mail.send(msg)
+    return jsonify({"resp": "success"})
+ 
 def update_state(tableId, newState):
 
     tableRef = firestore_db.collection("tables")
