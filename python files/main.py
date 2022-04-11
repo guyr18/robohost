@@ -15,6 +15,9 @@ tableList = []
 
 NewAssignment = False
 
+global needToGetNextCustomer
+needToGetNextCustomer = True
+
 # callback_cust_done = threading.Event()
 # callback_table_done = threading.Event()
 
@@ -203,7 +206,9 @@ Function that will set an available table to the waiting state because a new cus
 """
 def setTableWaiting(tableID):
     tempTable = FindTableInList(tableID)
+    print(f"Setting table {tempTable.getID()} to waiting...")
     tempTable.changeWaitingForCust()
+    print(f"New status for {tempTable.getID()} is {tempTable.getStatus()}")
     return tempTable
 
 """
@@ -280,11 +285,18 @@ def main():
     while True:
         try:
             tempAvaList = allAvailableTableList()
-            curCust = getNextPerson()
+            global needToGetNextCustomer
+            if needToGetNextCustomer:
+                print("Getting next customer from the queue...")
+                curCust = getNextPerson()
+                print(f"Got {curCust.getName()} from the queue...")
+                needToGetNextCustomer = False
             tempTableID = tableMarker(curCust, tempAvaList)
             if tempTableID != -1:
                 tempTable = setTableWaiting(tempTableID)
                 table_col_ref.document(str(tempTable.getID())).update({"strState": tempTable.getStatus()})
+                print("Update was made")
+                needToGetNextCustomer = True
             print("Listening for changes...")
             sleep(10)
         except KeyboardInterrupt:
