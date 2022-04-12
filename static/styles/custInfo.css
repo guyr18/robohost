@@ -1,0 +1,125 @@
+/* new file */
+        h1 {       
+
+
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 124px;
+        line-height: 145px;
+        text-align: center;
+
+        color: rgba(0, 0, 0, 0.25);
+        -webkit-text-stroke: .5px white;
+        
+        padding: -20px; 
+        margin: -20px;
+        }
+
+        body{
+            margin: 0;
+            background: #45ADA8;
+        }
+        
+        h2 {
+        
+            font-family: Roboto;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 25px;
+            line-height: 56px;
+            text-align: center;
+        
+            color: #FFFFFF;
+        }
+
+        form{
+            text-align: center;
+            height: auto;
+            width: auto;
+        }
+        
+        input[type=text], select {
+        display: inline-block;
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        background-color: #9DE0AD;
+        border: 1px solid #000000BF;
+        border-radius: 4px;
+        box-sizing: border-box;
+        }
+
+        input[type=submit] {
+        
+        width: 100%;
+        background-color: #45ADA8;
+        font-size: 20px;
+        color: #9DE0AD;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+        
+        background-color:  #547980;
+        }
+
+
+        .info {
+        width: 600px;
+        margin: auto;
+        border-radius: 7px;
+        background-color: #45ADA8;
+        padding: 10px;
+        }
+
+        .topLeftCircle{
+            /* Ellipse 18 */
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            left: 60px;
+            top: 100px;
+            border-radius: 50%;
+        
+            background: rgba(229, 252, 194, 0.25);
+        }
+        
+        .topRightCircle{
+            /* Upper Right Corner */
+            position: absolute;
+            width: 225px;
+            height: 225px;
+            left: 1100px;
+            top: -49px;
+            border-radius: 50%;
+        
+            background: rgba(229, 252, 194, 0.78);
+        }
+
+        
+        .bottomRightCircle{
+            /* Lower Right Corner */
+            position: absolute;
+            width: 414px;
+            height: 414px;
+            left: 900px;
+            top: 400px;
+            border-radius: 50%;
+        
+            background: rgba(229, 252, 194, 0.3);
+        }
+        
+        img{
+            /* Robot Laptop 1 */
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            left: 60px;
+            top: 100px;
+        }
+    
