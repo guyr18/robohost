@@ -1,4 +1,5 @@
-<!--employee views layout here-->
+<!-- Manager View page-->
+
 
 <!DOCTYPE html>
 
@@ -10,202 +11,282 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles/managerView.css') }}">
+        <script src="https://unpkg.com/konva@8.3.3/konva.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-        <style>
 
+        <script> 
 
-            body
+        var tables = {}; // Table reference cache.
+        var objTableData = {}; // Table data cache.
+        var selectedTableKey = null; // Currently selected data key.
+        var tableCount = 0; // Running counter of tables; 
+        var tailTable = null; // Last table added to tables.
+        var stage = null; // Reference to root layer used by Konva.
+        var globalLayer = new Konva.Layer(); // Globalized layer to avoid excessive layer creation.
+
+        // Color map for assigning table colors.
+        var colorStateMap = {"Idle": "#5FAAF0", "default": "#5FAAF0", "Available": "#9FE15C", "In Use": "#C4C4C4", "Needs to Be Cleaned": "#F16464"};
+
+        function getCookie(cname) 
+        {
+
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+
+            for(let i = 0; i < ca.length; i++)
             {
-                background-color: #45ADA8;
-                position: relative;
+
+                let c = ca[i];
+
+                while (c.charAt(0) == ' ') 
+                {
+
+                    c = c.substring(1);
+                }
+
+                if (c.indexOf(name) == 0) 
+                {
+
+                    return c.substring(name.length, c.length);
+
+                }
             }
 
-            h3
-            {
-                color: rgb(235, 235, 235);
-                background: radial-gradient(circle, #000000, 500px);
-                position: center;
-                background-clip:padding-box;
-                background-size: 100%;
-                background-image: #000000;
-            }
+            return "";
 
+        }
+
+        function deleteCookie(cname) 
+        {
+
+            document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        }
+
+        function logout()
+        {
+
+            deleteCookie("strName");
+
+        }
+
+        // If either is missing, this user does not belong on this web page.
+        if(getCookie("strName") == "" || getCookie("accessLevel") == "")
+        {
+
+            location.href = "employeeLogin";
+
+        }
+  
+        function fillTables(src)
+        {
+
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            stage = new Konva.Stage({
+
+                container: "container",
+                width: windowWidth,
+                height: windowHeight,
+
+            });
+
+            const itemsPerRow = 5; 
+            const usedRows = Math.ceil(src.length / itemsPerRow);
+            let slotsLeft = src.length;
             
-            .rectangle{
-                position:absolute;
-                width: 1100px;
-                height: 600px;
-                left: 120px;
-                top: 110px;
-
-                background: #8b8b8b;
-                border: 1.5px solid #000000;
-                border-radius: 10px;
-                box-sizing: border-box;
-            }
-
-            .hamburgerButton
+            for(let i = 0; i < usedRows; i++)
             {
-                color: black;
-                border: 2px;
-                border-color: grey;
-                position: absolute;
-                width: 130px;
-                height: 30px;
-                padding: 25px;
-                cursor: pointer;
-                z-index: 1;
-            }
 
-            .YourTables{
-            box-shadow: 0px 4px 8px 7px rgba(32, 0, 225, 0.55);
-            border-radius: 25px;
-            }
+               
+                const colLimit = slotsLeft > 5 ? 5 : slotsLeft;
+                let prevBox = null;
 
-            .TablesQueue
+                for(let j = 0; j < colLimit; j++, tableCount++)
+                {
+
+                    const posX = j == 0 ? 100 : prevBox.position().x + 200;
+                    const posY = i * 100;
+                    
+                    let box = new Konva.Group({
+
+                        name: src[i * itemsPerRow + j].tableId,
+                        x: posX,
+                        y: posY,
+                        width: 100,
+                        height: 50,
+                        draggable: false,
+
+                    });
+
+                    var surface = new Konva.Rect({
+
+                        width: 100,
+                        height: 50,
+                        fill: "#00D2FF",
+                        stroke: "black",
+                        strokeWidth: 4,
+
+                    });
+
+                    box.add(surface);
+                    box.add(new Konva.Text({
+
+                        text: box.name(),
+                        fontSize: 18,
+                        fill: "#000",
+                        align: 'center',
+                        width: 75,
+                        padding: 20,
+                        x: 12,
+
+                    }));
+
+                    surface.fill(colorStateMap[objTableData[box.name()].strState]);
+                    box.on("click", () => {
+
+                        showTableProps(box.name());
+
+                    });
+
+                    prevBox = box;
+                    tables[src[i * itemsPerRow + j].tableId] = box;
+                    globalLayer.add(box);
+                    stage.add(globalLayer);
+
+                    if(i == usedRows - 1 && j == colLimit - 1) { tailTable = box; }
+
+                }
+
+                slotsLeft -= colLimit;
+
+            }
+        }
+
+
+        function showTableModal(key)
+        {
+
+            console.log("showTableModal()");
+            $('.modeSection').show();
+
+        }
+
+        function showTableProps(key)
+        {
+
+            console.log("showTableProps()");
+            selectedTableKey = key;
+            $('.propText').text(() => {
+                
+                return ("Currently viewing Table [ID = " + key.toString() + "]");
+
+            });
+
+            let curState = objTableData[key].strState;
+
+            if(curState == "default")
             {
-                width: 176px;
-                height: 94px;
-                padding: 35px;
-                background: linear-gradient(to bottom, #3b9af3, #5FAAF0, #87bdf0);
-                border: .1px solid #000000;
-                box-sizing: border-box;
-                box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 25px;
-                text-align: center;
-                margin: 10px 15px;
-                float: left;
+
+                curState = "Idle";
+
             }
 
-            .TablesQueue .TextGradientBlue
+            let filter = 'select option[value="' + curState + '"]';
+            console.log(filter);
+            $('.tableInfo').show();
+            $('option:selected').attr('selected', false);
+            $(filter).attr("selected",true);
+            $('.vnsInput').val(objTableData[key].numSeats.toString());
+            $('.suidInput').val(objTableData[key].sectionUid.toString());
+
+        }
+
+        function updateTablePos(key, x, y)
+        {
+
+            console.log("Updating table position for key => " + key);
+
+            if(tables[key] != null)
             {
-                background: linear-gradient(to bottom,#87bdf0, #3b9af3);
-                border-radius: 50px;
-                margin-left: 14px;
-                margin-right: 14px;
-                height: 80px;
-                margin-top: -55px;
-            }
 
-            .TablesBusy
+                tables[key].position({x: x, y: y});
+           
+            }
+        }
+
+        function addTable(tableId)
+        {
+
+            if(tableCount == 25)
             {
-                width: 176px;
-                height: 94px;
-                padding: 35px;
-                background: linear-gradient(to bottom, #f05151, #f36969, #f07b7b);
-                border: .1px solid #000000;
-                box-sizing: border-box;
-                box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 25px;
-                text-align: center;
-                margin: 10px 15px;
-                float: left;
-                cursor: pointer;                
+
+                console.log("Max tables reached, can\'t add anymore.");
+                return;
+
             }
 
-            .TablesBusy .TextGradientRed
-            {
-                background: linear-gradient(to bottom,#f07b7b, #f05151);
-                border-radius: 50px;
-                margin-left: 14px;
-                margin-right: 14px;
-                height: 80px;
-                margin-top: -55px;
-            }
-            
-            .TablesInUse
-            {
-                width: 176px;
-                height: 94px;
-                padding: 35px;
-                background: linear-gradient(to bottom, #979797, #C4C4C4, #dbdbdb);
-                border: .1px solid #000000;
-                box-sizing: border-box;
-                box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 25px;
-                text-align: center;
-                margin: 10px 15px;
-                float: left;
-            }
+            // Conditionals indicate: does adding a new item require a new row? If so,
+            // offset coordinates accordingly.
+            const itemsPerRow = 5;
+            const posX = (tableCount + 1) % itemsPerRow == 1 ? 100 : tailTable.position().x + 200;
+            const posY = (tableCount + 1) % itemsPerRow == 1 ? tailTable.position().y + 100 : tailTable.position().y;
 
-            .TablesInUse .TextGradientGrey
-            {
-                background: linear-gradient(to bottom,#dbdbdb, #979797);
-                border-radius: 50px;
-                margin-left: 14px;
-                margin-right: 14px;
-                height: 80px;
-                margin-top: -55px;
-            }
+            let box = new Konva.Group({
+                
+                name: tableId.toString(),
+                x: posX,
+                y: posY,
+                width: 100,
+                height: 50,
+                draggable: true,
 
-            .TablesReady
-            {
-                width: 176px;
-                height: 94px;
-                padding: 35px;
-                background: linear-gradient(to bottom, #76bd2f, #9FE15C, #a9e76c);
-                border: .1px solid #000000;
-                box-sizing: border-box;
-                box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 25px;
-                text-align: center;
-                margin: 10px 15px;
-                float: left;
-                cursor: pointer;
-            }
+            });
 
-            .TablesReady .TextGradientGreen
-            {
-                background: linear-gradient(to bottom,#a9e76c, #76bd2f);
-                border-radius: 50px;
-                margin-left: 14px;
-                margin-right: 14px;
-                height: 80px;
-                margin-top: -55px;
-            }
+            var surface = new Konva.Rect({
 
-            .MenuLayer
-            {
-            background-color: rgba(196, 196, 196, 0.801);
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1;
-            top: 0;
-            left: 0;
-            overflow-x: hidden;
-            transition: 0.60s;
-            }
+                width: 100,
+                height: 50,
+                fill: '#00D2FF',
+                stroke: 'black',
+                strokeWidth: 4,
 
-            .MenuLayerLinks
-            {
-                position: relative;
-                top: 25%;
-                padding: 35px;
-                width: 100%;
-                text-align: center;
-            }
+            });
 
-            .MenuLayer a, .employeeText
-            {
-            padding: 18px;
-            text-decoration: none;
-            font-size: 36px;
-            color: #000000;
-            display: block;
-            transition: 0.3s;
-            }
+            box.add(surface);
+            box.add(new Konva.Text({
 
-            .MenuLayer a:hover, .MenuLayer a:focus
-            {
-                color: #f1f1f1;
-            }
+                text: box.name(),
+                fontSize: 18,
+                fill: "#000",
+                align: 'center',
+                width: 75,
+                padding: 20,
+                x: 12,
 
+            }));
 
-        </style>
-    </head>
-    <body>
+            surface.fill(colorStateMap[objTableData[box.name()].strState]);
+            box.on("click", () => {
+
+                showTableProps(box.name());
+
+            });
+
+            tableCount++;
+            tailTable = box;
+            tailTable.position({x: posX, y: posY});
+            tables[tableId] = box;
+            globalLayer.add(box);
+            stage.add(globalLayer);
+                
+        }
+
+        </script>
         <div id="myMenu" class="MenuLayer">
             <a href="javascript:void(0)" class="closeMenuButton" onclick="toggleNav()"></a>
             <div class="MenuLayerLinks">
@@ -215,65 +296,7 @@
                 <p class="employeeText">Employee: </p>
             </div>
             <script>
-
-            // Check that user has correct cookies to access this page.
-
-            function getCookie(cname) 
-            {
-
-                let name = cname + "=";
-                let decodedCookie = decodeURIComponent(document.cookie);
-                let ca = decodedCookie.split(';');
-
-                for(let i = 0; i <ca.length; i++)
-                {
-
-                    let c = ca[i];
-
-                    while (c.charAt(0) == ' ') 
-                    {
-
-                        c = c.substring(1);
-                    }
-
-                    if (c.indexOf(name) == 0) 
-                    {
-
-                        return c.substring(name.length, c.length);
-
-                    }
-                }
-
-                return "";
-
-            }
-
-            function deleteCookie(cname) 
-            {
-
-                document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-            }
-
-            function logout()
-            {
-
-                deleteCookie("strName");
-
-            }
-
-
-            // If either is missing, this user does not belong on this web page.
-
-            if(getCookie("strName") == "" || getCookie("accessLevel") == "0")
-            {
-
-                location.href = "employeeLogin";
-
-            }
-
             function toggleNav() {
-
                 var element = document.getElementById("myMenu");
                 if (element.style.width == "250px") {
                     element.style.width = "0px";
@@ -282,60 +305,258 @@
                 }
             }
 
-            window.onload = function() {
+            $(document).ready(() => {
 
-                document.querySelector(".employeeText").innerHTML = "Employee: " + getCookie("strName");
+
+                $(".employeeText").text(() => {
+                
+                    return "Employee: " + getCookie("strName");
+
+                });
+            
+                $('input:radio[name=add]').prop('checked', true);
+                $('.remSection').hide();
+                $('.tableInfo').hide();
 
                 fetch('/data_handler', {
 
+                headers: {
+
+                    'Content-Type': 'application/json'
+
+                },
+
+                method: 'POST',
+                
+                body: JSON.stringify({
+
+                    "intType": 0
+
+                })
+
+                }).then(function (response) {
+
+                    return response.json();
+
+                }).then(function (data) {
+
+                    return data.src;
+
+                }).then(function (tableData) {
+
+                    for(key in tableData)
+                    {
+
+                        const useKey = tableData[key].tableId.toString();
+                        objTableData[useKey] = {strState: "", numSeats: -1, sectionUid: -1};
+                        objTableData[useKey].strState = tableData[key].strState;
+                        objTableData[useKey].numSeats = tableData[key].numSeats;
+                        objTableData[useKey].sectionUid = tableData[key].sectionUid;
+
+                    }
+
+                    fillTables(tableData);
+
+                });
+
+                $('.confirmBtn').click(() => {
+
+                    console.log("Add table clicked");
+                    let tableId = $('.numInput').val();
+                    let numSeats = $('.seatInput').val();
+                    let sectId = $('.sectInput').val();
+                    let newState = $('.addSectStateInput option:selected').val();
+                    fetch('/add_table', {
+
                     headers: {
-                     'Content-Type': 'application/json'
-                    },
+                        'Content-Type': 'application/json'
+                        },
 
                     method: 'POST',
+
+                    body: JSON.stringify({
+                            "tableId": tableId,
+                            "numSeats": numSeats,
+                            "sectionUid": sectId,
+                            "strState": newState,
+                    })
 
                     }).then(function (response) { 
                         return response.json();
 
                     }).then(function (data) {
 
-                        console.log(data);
+                        objTableData[tableId] = {strState: newState, sectionUid: sectId, numSeats: numSeats};
+                        addTable(tableId, tables, new Konva.Layer());
+                        $('.numInput').val($('.numInput').prop('placeholder'));
+                        $('.seatInput').val($('.seatInput').prop('placeholder'));
+                        $('.sectInput').val($('.sectInput').prop('placeholder'));
 
                     });
+                });
 
-                }
+                $('.confirmRemBtn').click(() => {
+
+                    let tableId = $('.remId').val();
+
+                    fetch('/remove_table', {
+
+                    headers: {
+
+                        'Content-Type': 'application/json',
+                    
+                    },
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+
+                        "tableId": tableId,
+
+                    })
+
+                    }).then(function (response) {
+
+                        return response.json();
+
+                    }).then(function (data) {
+
+                        let code = data.code;
+
+                        if(code == 0)
+                        {
+
+                            console.log("Invalid table ID specified");
+
+                        }
+                        else
+                        {
+
+                            console.log("Table deleted successfully.");
+                            $('.remId').val($('.remId').prop('placeholder'));
+
+                            // Find new tail table
+                            if(tailTable.name() == tableId.toString())
+                            {
+
+                                const n = tableCount;
+                                const onDiffRow = (n - 1) % 5 == 0;
+                                console.log(n);
+
+                                for(key in tables)
+                                {
+
+                                    const xMatch = !onDiffRow ? tables[key].position().x == tailTable.position().x - 200 : tables[key].position().x == 900;
+                                    const yMatch = !onDiffRow ? tables[key].position().y == tailTable.position().y : tables[key].position().y == (Math.ceil((n - 1) / 5) * 100) - 100;
+
+                                    if(xMatch && yMatch)
+                                    {
+
+                                        tailTable = tables[key];
+                                        break;
+
+                                    }
+                                }
+                            }
+
+                            // Destroy and deallocate removed table.
+                            tableCount--;
+                            tables[tableId].destroy();
+                            delete tables[tableId];
+
+                        }
+
+                    });
+                });
+
+                $('input:radio').change(function() {
+
+                    if(this.name == "add")
+                    {
+
+                        $('input:radio[name=sub]').prop('checked', false);
+                        console.log("add clicked");
+                        $('.remSection').hide();
+                        $('.inputSection').show();
+
+                    }
+                    else
+                    {
+
+                        console.log("remove clicked");
+                        $('input:radio[name=add]').prop('checked', false);
+                        $('.inputSection').hide();
+                        $('.remSection').show();
+
+                    }
+                });
+
+                $('.updBtn').click(() => {
+
+                    fetch('/data_handler', {
+
+                    headers: {
+
+                        'Content-Type': 'application/json',
+
+                    },
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+
+                        "intType": 1,
+                        "tableId": selectedTableKey,
+                        "newState": $('.stateInputProp option:selected').val(),
+
+                    })
+
+                    }).then(function (response) {
+
+                        return response.json();
+
+                    }).then(function (data) {
+
+                        console.log(data.resp);
+                        console.log(data.newState);
+                        let surface = tables[selectedTableKey].getChildren()[0];
+                        surface.fill(colorStateMap[data.newState]);
+                        objTableData[selectedTableKey].strState = data.newState;
+                        
+                    });
+                });
+            });
+            
 
             </script>
         </div>
+    </head>
+    <body>
+
         <div class="rectangle">
             <div>
-                <h3 class="TablesQueue"> 1 <div class="TextGradientBlue"></div></h3>
-                <h3 class="TablesBusy"> 2 <div class="TextGradientRed"></div></h3>
-                <h3 class="TablesInUse"> 3 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesReady"> 4 <div class="TextGradientGreen"></div></h3>
-                <h3 class="TablesInUse"> 5 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesReady"> 6 <div class="TextGradientGreen"></div></h3>
-                <h3 class="TablesReady"> 7 <div class="TextGradientGreen"></div></h3>
-                <h3 class="TablesInUse"> 8 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesQueue"> 9 <div class="TextGradientBlue"></div></h3>
-                <h3 class="TablesReady"> 10 <div class="TextGradientGreen"></div></h3>
-                <h3 class="TablesInUse"> 11 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesInUse"> 12 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesInUse"> 13 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesReady"> 14 <div class="TextGradientGreen"></div></h3>
-                <h3 class="TablesInUse"> 15 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesBusy"> 16 <div class="TextGradientRed"></div></h3>
-                <h3 class="TablesInUse"> 17 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesInUse"> 18 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesInUse"> 190 <div class="TextGradientGrey"></div></h3>
-                <h3 class="TablesInUse"> 20 <div class="TextGradientGrey"></div></h3>
+                <div id="container"></div>
+                <div class="tablePropertyModal">
+                    <p class="propText">No Table Currently Selected.</p>
+                    <div class="tableInfo">
+                        <label class="infoState">
+                            <label for="stateInputProp">State:</label>
+                            <select class="stateInputProp">
+                                <option value="Idle">Idle</option>
+                                <option value="In Use">In Use</option>
+                                <option value="Available">Available</option>
+                                <option value="Needs to Be Cleaned">Needs to Be Cleaned</option>
+                            </select>
+                            <button class="updBtn">
+                                <p class="updTxt">Update</p>
+                            </button>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
-
         <div class="hamburgerButton">
             <img src="{{ url_for('static',filename='images/hambutton.png') }}" alt="Hamburger Button" width="60" height="35" onclick="toggleNav()">
         </div>
     </body>
-
-
 </html>
