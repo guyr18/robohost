@@ -80,6 +80,13 @@
             location.href = "employeeLogin";
 
         }
+
+        if(getCookie("accessLevel") != "2")
+        {
+
+            location.href = getCookie("accessLevel") == 0 ? 'cview' : 'eview';
+            
+        }
   
         function fillTables(src)
         {
