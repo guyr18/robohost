@@ -3,8 +3,8 @@ import TableInformation as TableInfo
 from queue import Queue
 import firebase_admin
 from firebase_admin import credentials, firestore
-#import threading
 from time import sleep
+from wait import computeWaitTime
 
 
 # Queue object to hold all the awaiting customers
@@ -13,13 +13,9 @@ q = Queue(maxsize=0)
 # List to hold onto the tables
 tableList = []
 
-NewAssignment = False
-
-global needToGetNextCustomer
 needToGetNextCustomer = True
 
-# callback_cust_done = threading.Event()
-# callback_table_done = threading.Event()
+savedCust = -1
 
 """
 Function to add a person to the queue
@@ -33,11 +29,21 @@ def addPerson(name, number, partySize):
     q.put(tempPerson)
 
 """
+Function to get the wait time in minutes of the queue at the queue's current size
+
+@:return    the wait time given the queue
+"""
+def getWaitTime():
+    return computeWaitTime(q)
+
+"""
 Will get the next person in the queue
 
 RETURNS the next PersonalInfo object from the queue
 """
 def getNextPerson():
+    if q.empty():
+        return -1
     nextPerson = q.get()
     return nextPerson
 
@@ -192,6 +198,8 @@ Function to determine if a customer can sit at one of the tables within the list
 @:return    A table ID associated with a table that the customer can sit at, an ID of -1 marks that no table was found
 """
 def tableMarker(cust, tables):
+    if cust == -1:
+        return cust
     for table in tables:
         if checkCanSit(table, cust):
             print(f"A table has been found, table {table.getID()}")
@@ -229,9 +237,6 @@ def on_snapshot_cust_info(col_snapshot, changes, readtime):
             addPerson(name, email, partySize)
             print(f"{name} has been added to the queue.")
             print(f"New queue size {q.qsize()}\n")
-        # elif change.type.name == "MODIFIED":
-        #     print(f"Document {change.document.id} has been modified in the database")
-        #     print(f"New information for {change.document.id}\nName: {name}\nEmail: {email}\nParty Size: {partySize}\n")
     #callback_cust_done.set()
 
 def on_snapshot_table_info(col_snapshot, changes, readtime):
@@ -263,7 +268,10 @@ def main():
     print("Getting connection to FireStore database...")
     # Auth us into the firebase
     cred = credentials.Certificate("firebase_private_key.json")
-    firebase_admin.initialize_app(cred)
+    try:
+        firebase_admin.get_app()
+    except ValueError:
+        firebase_admin.initialize_app(cred)
 
     # connect to the the database, this is the entire database
     db = firestore.client()
@@ -283,137 +291,34 @@ def main():
     # Loop causes this to keep running allowing the listener to constantly be active
     # Without the loop function will exit causing an exit to the code
     while True:
-        try:
-            tempAvaList = allAvailableTableList()
-            global needToGetNextCustomer
-            if needToGetNextCustomer:
-                print("Getting next customer from the queue...")
+        tempAvaList = allAvailableTableList()
+        global needToGetNextCustomer
+        global savedCust
+        if needToGetNextCustomer:
+            print("Checking the queue for next customer")
+            if not q.empty():
+                print("Queue was not empty")
                 curCust = getNextPerson()
-                print(f"Got {curCust.getName()} from the queue...")
+                print(f"Found {curCust.getName()}")
                 needToGetNextCustomer = False
-            tempTableID = tableMarker(curCust, tempAvaList)
+                savedCust = curCust
+            else:
+                print("Waiting for another customer to enter queue")
+        if savedCust != -1:
+            print(f"Looking at the available tables for {savedCust.getName()}")
+            tempTableID = tableMarker(savedCust, tempAvaList)
             if tempTableID != -1:
                 tempTable = setTableWaiting(tempTableID)
                 table_col_ref.document(str(tempTable.getID())).update({"strState": tempTable.getStatus()})
                 print("Update was made")
                 needToGetNextCustomer = True
-            print("Listening for changes...")
-            sleep(10)
-        except KeyboardInterrupt:
-            break
+                savedCust = -1
 
-    # #Old Menu for queue testing. Leaving here for testing purposes.
-    # print("Please enter the corrisponding number for the menu selection for testing.")
-    # optionNum = int(input("1. Enter in single person information\n2. Enter in multiple people information\n"
-    #                       "3. Enter the table information test\n4. Enter the table and cust compare info\n"
-    #                       "5. Test the available status list\n6.Enter the table marker test\n"))
-    # if optionNum == 1:
-    #     testEnterSingle()
-    # if optionNum == 2:
-    #     testEnterMulti()
-    # if optionNum == 3:
-    #     testTableStuff()
-    # if optionNum == 4:
-    #     print("Testing the customer party size checker and the table seat\nFollow the prompts")
-    #     cust1Name = input("Enter in customer 1 name\n")
-    #     cust1email = "fake@email.com"
-    #     cust1PartySize = int(input("Enter customer 1 party size\n"))
-    #     cust1 = PerInfo.PersonalInfo(cust1Name, cust1email, cust1PartySize)
-    #     print(f"Customer {cust1.getName()} created...")
-    #     table1ID = int(input("Enter in table 1 ID\n"))
-    #     table1SeatCount = int(input("Enter in table 1 seat count\n"))
-    #     table1Status = "Status dont matter"
-    #     table1 = TableInfo.TableInfo(table1ID, table1SeatCount, table1Status)
-    #     print(f"Table {table1.getID()} created...")
-    #     cust2Name = input("Enter in customer 2 name\n")
-    #     cust2email = "fake@email.com"
-    #     cust2PartySize = int(input("Enter customer 2 party size\n"))
-    #     cust2 = PerInfo.PersonalInfo(cust2Name, cust2email, cust2PartySize)
-    #     print(f"Customer {cust2.getName()} created...")
-    #     table2ID = int(input("Enter in table 2 ID\n"))
-    #     table2SeatCount = int(input("Enter in table 2 seat count\n"))
-    #     table2Status = "Status dont matter"
-    #     table2 = TableInfo.TableInfo(table2ID, table2SeatCount, table2Status)
-    #     print(f"Table {table2.getID()} created...")
-    #     testCheckCanSit(table1, cust1, table2, cust2)
-    # if optionNum == 5:
-    #     print(f"Creating 10 tables, 4 are available, 2 is waiting, 2 are In Use, and 2 are Needs Cleaning...")
-    #     addTable(1, 1, "Available")
-    #     addTable(10, 2, "available")
-    #     addTable(6, 3, "available")
-    #     addTable(4, 4, "Available")
-    #     addTable(5, 5, "In Use")
-    #     addTable(3, 6, "in use")
-    #     addTable(7, 1, "Waiting")
-    #     addTable(8, 2, "waiting")
-    #     addTable(9, 3, "Needs Cleaning")
-    #     addTable(2, 4, "needs cleaning")
-    #     print("Printing table list...")
-    #     printTableList()
-    #     print("Testing the available table list function")
-    #     tempList = allAvailableTableList()
-    #     if len(tempList) == 4:
-    #         print("Test passed got a list of 4 available tables...")
-    #         for table in tempList:
-    #             print(f"Table {table.getID()}")
-    #     else:
-    #         print(f"Test failed the returned list is of size {len(tempList)}\nThe tables within the list are...")
-    #         for table in tempList:
-    #             print(f"Table {table.getID()}")
-    # if optionNum == 6:
-    #     print(f"Creating 10 tables, 4 are available, 2 is waiting, 2 are In Use, and 2 are Needs Cleaning...")
-    #     addTable(1, 1, "Available")
-    #     addTable(10, 2, "available")
-    #     addTable(6, 3, "available")
-    #     addTable(4, 4, "Available")
-    #     addTable(5, 5, "In Use")
-    #     addTable(3, 6, "in use")
-    #     addTable(7, 1, "Waiting")
-    #     addTable(8, 2, "waiting")
-    #     addTable(9, 3, "Needs Cleaning")
-    #     addTable(2, 4, "needs cleaning")
-    #     tempList = allAvailableTableList()
-    #     print("Creating customer Bob with an email of bob@email.com and a party size of 2")
-    #     tempCust1 = PerInfo.PersonalInfo("Bob", "bob@email.com", 2)
-    #     print("Creating customer Charlie with an email of charlie@email.com and a party size of 6")
-    #     tempCust2 = PerInfo.PersonalInfo("Charlie", "charlie@email.com", 6)
-    #     print("Creating customer Sara with an email of sara@email.com and a party size of 1")
-    #     tempCust3 = PerInfo.PersonalInfo("Sara", "sara@email.com", 1)
-    #     print("Testing the table marker with Bob, he should match with any table that has a seat cap of 2 or more...")
-    #     tempTableID = tableMarker(tempCust1, tempList)
-    #     if tempTableID != -1 and tempTableID != 1:
-    #         print("The first test was a success")
-    #     else:
-    #         print("The first test was a failure")
-    #     print("Testing the table marker with Charlie, he should not match with any table...")
-    #     tempTableID = tableMarker(tempCust2, tempList)
-    #     if tempTableID == -1:
-    #         print("The second test was a success")
-    #     else:
-    #         print("The second test was a failure")
-    #     print("Testing the table marker with Sara, she should only be matched with with a table that has a set cap of 1, which is only table 1 in the list...")
-    #     tempTableID = tableMarker(tempCust3, tempList)
-    #     if tempTableID == 1:
-    #         print("The third test was a success")
-    #     else:
-    #         print("The third test was a failure")
-
-
-
-
-
-    # printQueue()
-    # printTableList()
-
-    # A check to make sure can find tables based on an ID
-    # testTableListChecker(8)
-
-    cust_col_watch.unsubscribe()
-    table_col_watch.unsubscribe()
-    print("Exiting")
+        print("Listening for changes...")
+        sleep(10)
 
 """
-Causes the main function to run
+Causes the main function to run if this script is running
 """
 if __name__ == "__main__":
     main()
