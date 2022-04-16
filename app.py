@@ -3,10 +3,14 @@ from firebase_admin import credentials, firestore;
 
 from flask import Flask, jsonify, request, render_template
 from flask_mail import Mail, Message
+from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 import os
 
 # Initialize Flask
 app = Flask(__name__, template_folder="public/Main/")
+socketIO_ = SocketIO(app, async_mode=None)
+CORS(app)
 
 # Initialize Firebase / Firestore
 cred = credentials.Certificate("firebase_private_key.json")
@@ -22,6 +26,15 @@ app.config['MAIL_PASSWORD'] = 'Csci4230!'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
+
+# SocketIO event handlers
+@socketIO_.on('connect')
+def connect_handler(auth):
+    print("Client connected")
+
+@socketIO_.on('disconnect')
+def disconnect_handler():
+    print("Client disconnected.")
 
 @app.route('/data_handler', methods=['POST'])
 def data_handler():
@@ -61,6 +74,7 @@ def update_state(tableId, newState):
     tableRef = firestore_db.collection("tables")
     idQuery = tableRef.document(tableId)
     idQuery.update({"strState": newState})
+    socketIO_.emit('update_state_recv', {'tableId': tableId, 'strState': newState}, broadcast=True)
     return jsonify({"resp": "success", "newState": newState})
 
 def load_table():
@@ -105,6 +119,7 @@ def add_table():
         })
 
         objData['resp'] = 'Table added successfully.'
+        socketIO_.emit('add_table_recv', {'tableId': tableId, 'numSeats': numSeats, 'sectionUid': sectionUid, 'strState': strState}, broadcast=True)
         return jsonify(objData)
 
 @app.route('/remove_table', methods=['POST'])
@@ -123,6 +138,8 @@ def remove_table():
 
             colTables.document(tableId).delete()
             objData['code'] = 1
+            socketIO_.emit('rem_table_recv', {'tableId': tableId}, broadcast=True)
+
         else:
             objData['code'] = 0
 
@@ -207,4 +224,4 @@ def render_cust_confirm():
     return render_template('custConfirm.html')
     
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT', 8080)))
+    socketIO_.run(app, debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))

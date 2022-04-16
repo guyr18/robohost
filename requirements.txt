@@ -1,4 +1,6 @@
 # requirements.txt
 flask
 firebase_admin
-twilio
+Flask-Mail
+flask-socketio
+flask-cors

@@ -9,12 +9,14 @@
             Employee View
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> 
         <meta charset="utf-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ url_for('static',filename='styles/managerView.css') }}">
         <script src="https://unpkg.com/konva@8.3.3/konva.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
 
         <script> 
 
@@ -318,6 +320,98 @@
                 $('.remSection').hide();
                 $('.tableInfo').hide();
 
+                // HANDLE web sockets for real-time
+                var socket = io.connect("");
+
+                socket.on('connect', () => {
+
+                    console.log("Client connected.");
+
+                });
+
+                socket.on('disconnect', () => {
+
+                    console.log("Client disconnected.");
+
+                });
+
+                socket.on('update_state_recv', (data) => {
+
+                    if(tables[data.tableId] != null && tables[data.tableId].strState != data.strState)
+                    {
+
+                        console.log("Multicast received [event_name=update_state_recv]");
+                        let surface = tables[data.tableId].getChildren()[0];
+                        surface.fill(colorStateMap[data.strState]);
+                        objTableData[data.tableId].strState = data.strState;
+
+                    }
+                });
+
+                socket.on('add_table_recv', (data) => {
+
+                    if(objTableData[data.tableId] == null)
+                    {
+
+                        console.log("Multicast received [event_name=add_table_recv]");
+                        objTableData[data.tableId] = {strState: data.strState, sectionUid: data.sectionUid, numSeats: data.numSeats};
+                        addTable(data.tableId, tables, new Konva.Layer());
+                        $('.numInput').val($('.numInput').prop('placeholder'));
+                        $('.seatInput').val($('.seatInput').prop('placeholder'));
+                        $('.sectInput').val($('.sectInput').prop('placeholder'));
+
+                    }
+                });
+
+                socket.on('rem_table_recv', (data) => {
+
+                    if(objTableData[data.tableId] != null)
+                    {
+
+                        console.log("Multicast received [event_name=rem_table_recv]");
+                        console.log("Table deleted successfully.");
+                        $('.remId').val($('.remId').prop('placeholder'));
+
+                        // Find new tail table
+                        if(tailTable.name() == data.tableId.toString())
+                        {
+
+                            const n = tableCount;
+                            const onDiffRow = (n - 1) % 5 == 0;
+                            console.log(n);
+
+                            for(key in tables)
+                            {
+
+                                const xMatch = !onDiffRow ? tables[key].position().x == tailTable.position().x - 200 : tables[key].position().x == 900;
+                                const yMatch = !onDiffRow ? tables[key].position().y == tailTable.position().y : tables[key].position().y == (Math.ceil((n - 1) / 5) * 100) - 100;
+
+                                if(xMatch && yMatch)
+                                {
+
+                                    tailTable = tables[key];
+                                    break;
+
+                                }
+                            }
+                        }
+
+                        // Similarly, the synchronous block of code may be executed before the multicasted
+                        // socket message, making this a race condition. So, we check if this data exists
+                        // in the tables dictionary, if it does we will delete. If doesn't it will not be neccessary.
+                        if(tables[data.tableId] != null)
+                        {
+
+
+                            // Destroy and deallocate removed table.
+                            tableCount--;
+                            tables[data.tableId].destroy();
+                            delete tables[data.tableId];
+
+                        }
+                    }
+                });
+
                 fetch('/data_handler', {
 
                 headers: {
@@ -459,11 +553,19 @@
                                 }
                             }
 
-                            // Destroy and deallocate removed table.
-                            tableCount--;
-                            tables[tableId].destroy();
-                            delete tables[tableId];
+                            // This is now a race condition - sometimes multicasted messages in execute this block
+                            // of code first, meaning it has already been deleted. So, we run a conditional to see
+                            // if it has been deleted or not. If it is has not been deleted yet, then we can delete it.
+                            if(tables[tableId] != null)
+                            {
 
+                                // Destroy and deallocate removed table.
+                                tableCount--;
+
+                                tables[tableId].destroy();
+                                delete tables[tableId];
+
+                            }
                         }
 
                     });
