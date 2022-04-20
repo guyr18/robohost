@@ -5,7 +5,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from time import sleep
 from wait import computeWaitTime
-
+import smtplib, ssl
 
 # Queue object to hold all the awaiting customers
 q = Queue(maxsize=0)
@@ -16,6 +16,15 @@ tableList = []
 needToGetNextCustomer = True
 
 savedCust = -1
+
+#Email Stuff
+emailServer = smtplib.SMTP('smtp.gmail.com', 587)
+emailServer.starttls()
+roboEmail = "robohostnoreply@gmail.com"
+roboPass = "Csci4230!"
+emailServer.login(roboEmail, roboPass)
+
+
 
 """
 Function to add a person to the queue
@@ -220,6 +229,36 @@ def setTableWaiting(tableID):
     return tempTable
 
 """
+Sends an email once a person is added to the queue telling the person their estimated wait time
+
+@:param     cust        a customer object that hold personal information
+"""
+def sendWaitEmail(custName, custEmail):
+    print(f"Got customer {custName}...")
+    try:
+        message = "Hey there " + custName + ". You have been added to the queue. Your current wait time is " + \
+                    str(computeWaitTime(q)) + " minutes."
+        emailServer.sendmail(roboEmail, custEmail, message)
+        print("Customer added email sent...")
+    except BaseException as error:
+        print(f"Something didn't work...\n{error=}, {type(error)=}")
+
+
+def sendTableInfoEmail(cust, table):
+    print(f"Preparing to send an email to {cust.getName()} letting them know they have been seated at {table.getID()}")
+    try:
+        custName = cust.getName()
+        custEmail = cust.getEmail()
+        tableID = table.getID()
+        message = "Hey there " + custName + ".\n" + \
+                  "Your table is ready. Please report to table " + str(tableID) + ".\n" + \
+                  "Enjoy your meal!"
+        emailServer.sendmail(roboEmail, custEmail, message)
+        print("Customer table assign email sent...")
+    except BaseException as error:
+        print(f"Something didn't work...\n{error=}, {type(error)=}")
+
+"""
 This is a listener function for determining when a change is made to the database
 """
 def on_snapshot_cust_info(col_snapshot, changes, readtime):
@@ -237,6 +276,8 @@ def on_snapshot_cust_info(col_snapshot, changes, readtime):
             addPerson(name, email, partySize)
             print(f"{name} has been added to the queue.")
             print(f"New queue size {q.qsize()}\n")
+            print("Attempting to send email...")
+            sendWaitEmail(name, email)
     #callback_cust_done.set()
 
 def on_snapshot_table_info(col_snapshot, changes, readtime):
@@ -263,6 +304,7 @@ def on_snapshot_table_info(col_snapshot, changes, readtime):
 main function of this file
 """
 def main():
+
 
 
     print("Getting connection to FireStore database...")
@@ -311,6 +353,8 @@ def main():
                 tempTable = setTableWaiting(tempTableID)
                 table_col_ref.document(str(tempTable.getID())).update({"strState": tempTable.getStatus()})
                 print("Update was made")
+                print("Attempting to send an email to the customer...")
+                sendTableInfoEmail(savedCust, tempTable)
                 needToGetNextCustomer = True
                 savedCust = -1
 
