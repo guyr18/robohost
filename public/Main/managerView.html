@@ -26,6 +26,8 @@
         var tailTable = null; // Last table added to tables.
         var stage = null; // Reference to root layer used by Konva.
         var globalLayer = new Konva.Layer(); // Globalized layer to avoid excessive layer creation.
+        var lastTableDeleted = null; // Reference to last table deleted.
+        const MAX_TABLES = 25; // Maximum number of tables allowed to be rendered to DOM.
 
         // Color map for assigning table colors.
         var colorStateMap = {"Idle": "#5FAAF0", "default": "#5FAAF0", "Available": "#9FE15C", "In Use": "#C4C4C4", "Needs to Be Cleaned": "#F16464"};
@@ -82,6 +84,9 @@
 
         }
 
+        // An access level of 2 indicates that the user is a manager. Only managers
+        // are allowed on this view. So, we re-direct them to the appropriate view
+        // if they are not a manager.
         if(getCookie("accessLevel") != "2")
         {
 
@@ -89,12 +94,17 @@
             
         }
   
+        // FillTables(src) renders tables to the DOM as Konva Group objects. 
         function fillTables(src)
         {
 
+            // Store constants that represent the width and height of
+            // a window.
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
 
+            // Initialize the Konva Stage object to a div id with a name
+            // of container and the windowWidth and windowHeight constants.
             stage = new Konva.Stage({
 
                 container: "container",
@@ -103,9 +113,9 @@
 
             });
 
-            const itemsPerRow = 5; 
-            const usedRows = Math.ceil(src.length / itemsPerRow);
-            let slotsLeft = src.length;
+            const itemsPerRow = 5; // The number of items per row.
+            const usedRows = Math.ceil(src.length / itemsPerRow); // The number of rows that will be needed.
+            let slotsLeft = src.length; // How many slots are left for the algorithm to fill.
             
             for(let i = 0; i < usedRows; i++)
             {
@@ -175,15 +185,8 @@
             }
         }
 
-
-        function showTableModal(key)
-        {
-
-            console.log("showTableModal()");
-            $('.modeSection').show();
-
-        }
-
+        // ShowTableProps(key) shows the table modal for displaying table-relative attributes. It takes a
+        // key as input that represents the table id.
         function showTableProps(key)
         {
 
@@ -214,35 +217,82 @@
 
         }
 
-        function updateTablePos(key, x, y)
-        {
-
-            console.log("Updating table position for key => " + key);
-
-            if(tables[key] != null)
-            {
-
-                tables[key].position({x: x, y: y});
-           
-            }
-        }
-
+        // AddTable(tableId) adds a table to the tables dictionary with the key tableId. It
+        // renders the table based on specified attributes to the DOM.
         function addTable(tableId)
         {
 
-            if(tableCount == 25)
+            // If the maximum number of tables have been reached, show an alert and return the function.
+            if(tableCount == MAX_TABLES)
             {
 
-                console.log("Max tables reached, can\'t add anymore.");
+                alert("Max tables reached, can\'t add anymore.");
                 return;
 
             }
 
-            // Conditionals indicate: does adding a new item require a new row? If so,
-            // offset coordinates accordingly.
-            const itemsPerRow = 5;
-            const posX = (tableCount + 1) % itemsPerRow == 1 ? 100 : tailTable.position().x + 200;
-            const posY = (tableCount + 1) % itemsPerRow == 1 ? tailTable.position().y + 100 : tailTable.position().y;
+            let posX = undefined;
+            let posY = undefined;
+            let recentlySet = lastTableDeleted != null;
+
+            // If a table was recently deleted, that means their is an empty slot, we can fill it instead of
+            // using more space.
+            if(lastTableDeleted != null)
+            {
+
+                posX = lastTableDeleted.position().x;
+                posY = lastTableDeleted.position().y;
+                lastTableDeleted = null;
+
+                // Find new tail table
+                let largestX = undefined;
+                let largestY = undefined;
+                let newKey = undefined;
+
+                // Find largest Y value among tables; this gives an idea of where
+                // the tables on the last row are located.
+                for(key in tables)
+                {
+
+                    largestY = largestY == undefined ? tables[key].position().y : Math.max(largestY, tables[key].position().y);
+
+                }
+
+                // Search for the table on the final row that is furthest to the right.
+                for(key in tables)
+                {
+
+                    // If this table is on the final row, then do enter this branch.
+                    if(tables[key].position().y == largestY)
+                    {
+
+                        // If no table has been set for this row, take the first one we see. Otherwise, check that
+                        // this table is further to the right than the previous one. If it is, we update the key
+                        // to the one found here.
+                        if((largestX == undefined && newKey == undefined) || (tables[key].position().x > largestX))
+                        {
+
+                            largestX = tables[key].position().x;
+                            newKey = key;
+
+                        }
+                    }
+                }
+
+                // Update the tail table to the newly found Konva object.
+                tailTable = tables[newKey];
+                
+            }
+            else
+            {
+
+                // Conditionals indicate: does adding a new item require a new row? If so,
+                // offset coordinates accordingly.
+                const itemsPerRow = 5;
+                posX = (tableCount + 1) % itemsPerRow == 1 ? 100 : tailTable.position().x + 200;
+                posY = (tableCount + 1) % itemsPerRow == 1 ? tailTable.position().y + 100 : tailTable.position().y;
+
+            }
 
             let box = new Konva.Group({
                 
@@ -286,8 +336,17 @@
             });
 
             tableCount++;
-            tailTable = box;
-            tailTable.position({x: posX, y: posY});
+
+            // If the delete phase was run, we just found the tail table. We don't want to 
+            // set it again. But if we are not filling an empty slot, then we run this.
+            if(!recentlySet)
+            {
+
+                tailTable = box;
+                tailTable.position({x: posX, y: posY});
+
+            }
+
             tables[tableId] = box;
             globalLayer.add(box);
             stage.add(globalLayer);
@@ -356,15 +415,15 @@
 
                 socket.on('add_table_recv', (data) => {
 
-                    if(objTableData[data.tableId] == null)
+                    if(objTableData[data.tableId] == null && tables[data.tableId] == null)
                     {
 
                         console.log("Multicast received [event_name=add_table_recv]");
                         objTableData[data.tableId] = {strState: data.strState, sectionUid: data.sectionUid, numSeats: data.numSeats};
                         addTable(data.tableId, tables, new Konva.Layer());
-                        $('.numInput').val($('.numInput').prop('placeholder'));
-                        $('.seatInput').val($('.seatInput').prop('placeholder'));
-                        $('.sectInput').val($('.sectInput').prop('placeholder'));
+                        $('.numInput').val('').prop('placeholder');
+                        $('.seatInput').val('').prop('placeholder');
+                        $('.sectInput').val('').prop('placeholder');
 
                     }
                 });
@@ -376,7 +435,7 @@
 
                         console.log("Multicast received [event_name=rem_table_recv]");
                         console.log("Table deleted successfully.");
-                        $('.remId').val($('.remId').prop('placeholder'));
+                        $('.remId').val('').prop('placeholder');
 
                         // Find new tail table
                         if(tailTable.name() == data.tableId.toString())
@@ -411,6 +470,7 @@
 
                             // Destroy and deallocate removed table.
                             tableCount--;
+                            lastTableDeleted = tables[data.tableId];
                             tables[data.tableId].destroy();
                             delete tables[data.tableId];
 
@@ -488,9 +548,9 @@
 
                         objTableData[tableId] = {strState: newState, sectionUid: sectId, numSeats: numSeats};
                         addTable(tableId, tables, new Konva.Layer());
-                        $('.numInput').val($('.numInput').prop('placeholder'));
-                        $('.seatInput').val($('.seatInput').prop('placeholder'));
-                        $('.sectInput').val($('.sectInput').prop('placeholder'));
+                        $('.numInput').val('').prop('placeholder');
+                        $('.seatInput').val('').prop('placeholder');
+                        $('.sectInput').val('').prop('placeholder');
 
                     });
                 });
@@ -533,7 +593,7 @@
                         {
 
                             console.log("Table deleted successfully.");
-                            $('.remId').val($('.remId').prop('placeholder'));
+                            $('.remId').val('').prop('placeholder');
 
                             // Find new tail table
                             if(tailTable.name() == tableId.toString())
@@ -569,7 +629,7 @@
 
                                 // Destroy and deallocate removed table.
                                 tableCount--;
-
+                                lastTableDeleted = tables[tableId];
                                 tables[tableId].destroy();
                                 delete tables[tableId];
 
@@ -584,7 +644,6 @@
                     {
 
                         $('input:radio[name=sub]').prop('checked', false);
-                        console.log("add clicked");
                         $('.remSection').hide();
                         $('.inputSection').show();
 
@@ -592,7 +651,6 @@
                     else
                     {
 
-                        console.log("remove clicked");
                         $('input:radio[name=add]').prop('checked', false);
                         $('.inputSection').hide();
                         $('.remSection').show();
