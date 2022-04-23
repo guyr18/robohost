@@ -18,6 +18,10 @@ needToGetNextCustomer = True
 savedCust = -1
 
 #Email Stuff
+
+# Subject constants
+CONFIRM_SUBJECT = "RoboHost - Table Confirmation"
+TABLE_SUBJECT = "RoboHost - Table Ready"
 emailServer = smtplib.SMTP('smtp.gmail.com', 587)
 emailServer.starttls()
 roboEmail = "robohostnoreply@gmail.com"
@@ -236,8 +240,10 @@ Sends an email once a person is added to the queue telling the person their esti
 def sendWaitEmail(custName, custEmail):
     print(f"Got customer {custName}...")
     try:
-        message = "Hey there " + custName + ". You have been added to the queue. Your current wait time is " + \
+
+        content = "Hey there " + custName + ". You have been added to the queue. Your current wait time is " + \
                     str(computeWaitTime(q)) + " minutes."
+        message = 'Subject: {}\n\n{}'.format(CONFIRM_SUBJECT, content)
         emailServer.sendmail(roboEmail, custEmail, message)
         print("Customer added email sent...")
     except BaseException as error:
@@ -250,9 +256,11 @@ def sendTableInfoEmail(cust, table):
         custName = cust.getName()
         custEmail = cust.getEmail()
         tableID = table.getID()
-        message = "Hey there " + custName + ".\n" + \
+        content = "Hey there " + custName + ".\n" + \
                   "Your table is ready. Please report to table " + str(tableID) + ".\n" + \
                   "Enjoy your meal!"
+        message = 'Subject: {}\n\n{}'.format(TABLE_SUBJECT, content)
+
         emailServer.sendmail(roboEmail, custEmail, message)
         print("Customer table assign email sent...")
     except BaseException as error:
