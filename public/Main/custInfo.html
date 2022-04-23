@@ -79,34 +79,8 @@
 
         .then(function(docRef) {
             console.log("Message sent, ID: ", docRef.id);
-            fetch('/data_handler', {
-
-            headers: {
-
-              'Content-Type': 'application/json',
-
-            },
-
-            method: 'POST',
-
-            body: JSON.stringify({
-
-              "intType": 2,
-              "name": enteredName,
-              "email": enteredEmail
-
-            })
-
-            }).then(function (response) {
-
-                return response.json();
-
-            }).then(function (data) {
-
-                console.log("Message sent successfully.");
-                location.href = '/custConfirm';
-
-            });
+            location.href = '/custConfirm';
+            
         })
         .catch(function(error) {
             console.error("Message could not be sent: ", error);

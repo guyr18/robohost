@@ -27,15 +27,3 @@ def computeWaitTime(Q):
     t = Q.qsize() * 5
     mins =  t if divisibleByFive else t - 5
     return mins if Q.queue[Q.qsize() - 1].getPartySize() < 5 else mins + 10
-
-myQueue = Queue(maxsize=10)
-myQueue.put(PersonalInformation("t1", "something@live.com", 3))
-myQueue.put(PersonalInformation("t2", "other@live.com", 5))
-myQueue.put(PersonalInformation("t3", "yay@live.com", 2))
-myQueue.put(PersonalInformation("t4", "asdf@outlook.com", 5))
-myQueue.put(PersonalInformation("t3", "yay@live.com", 3))
-myQueue.put(PersonalInformation("t3", "yay@live.com", 2))
-myQueue.put(PersonalInformation("t3", "yay@live.com", 2))
-myQueue.put(PersonalInformation("t4", "asdf@outlook.com", 3))
-waitTime = computeWaitTime(myQueue)
-print("Wait time: " + str(waitTime))

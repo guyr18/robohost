@@ -1,8 +1,8 @@
 # Dockerfile
-FROM python:3.7-stretch
+FROM python:3.8
 
 RUN apt-get update -y
-RUN apt-get install -y python-pip python-dev build-essential
+RUN apt-get install -y python3-pip python-dev build-essential
 
 ENV PORT 8080
 ENV HOST 0.0.0.0

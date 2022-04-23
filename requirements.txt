@@ -1,6 +1,5 @@
 # requirements.txt
 flask
 firebase_admin
-Flask-Mail
 flask-socketio
 flask-cors

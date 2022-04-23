@@ -1,10 +1,10 @@
 import firebase_admin
 from firebase_admin import credentials, firestore;
-
 from flask import Flask, jsonify, request, render_template
-from flask_mail import Mail, Message
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 from flask_cors import CORS
+from _thread import start_new_thread
+import RoboQueue
 import os
 
 # Initialize Flask
@@ -17,15 +17,6 @@ cred = credentials.Certificate("firebase_private_key.json")
 firebase_admin.initialize_app(cred)
 firestore_db = firestore.client()
 objData = {} # This is the object to send back to JS.
-
-# Flask email configuration details
-app.config['MAIL_SERVER']='smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'robohostnoreply@gmail.com'
-app.config['MAIL_PASSWORD'] = 'Csci4230!'
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
-mail = Mail(app)
 
 # SocketIO event handlers
 @socketIO_.on('connect')
@@ -51,23 +42,11 @@ def data_handler():
             return load_table()
 
         # intType = 1; update state
-        elif data['intType'] == 1:
+        else:
 
             return update_state(data['tableId'], data['newState'])
 
-        # intType = 2; send confirmation email message
-        else:
-            
-            return confirm_email(data['name'], data['email'])
-
         return jsonify(objData)
-
-def confirm_email(name, email):
- 
-    msg = Message('Robohost - Table Confirmation', sender=app.config['MAIL_USERNAME'], recipients=[email])
-    msg.body = "Hey, " + name + ". Thanks for checking in! Your estimated wait time is <x> minutes and <y> seconds."
-    mail.send(msg)
-    return jsonify({"resp": "success"})
  
 def update_state(tableId, newState):
 
@@ -225,3 +204,4 @@ def render_cust_confirm():
     
 if __name__ == '__main__':
     socketIO_.run(app, debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+robothread = start_new_thread(RoboQueue.main, ())
