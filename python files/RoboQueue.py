@@ -5,7 +5,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from time import sleep
 from wait import computeWaitTime
-import smtplib, ssl
+import smtplib
 
 # Queue object to hold all the awaiting customers
 q = Queue(maxsize=0)
@@ -55,67 +55,6 @@ def getNextPerson():
         return -1
     nextPerson = q.get()
     return nextPerson
-
-"""
-This is the testing function that is meant to test out the personal information entering manually for a single person
-"""
-def testEnterSingle():
-    name1 = input("Please enter person 1's name\n")
-    num1 = input("Please enter person 1's number\n")
-    ps1 = int(input("Please enter person 1's party size\n"))
-
-    addPerson(name1, num1, ps1)
-
-    printQueue()
-
-"""
-This is the testing function that is meant to test out entering multiple person
-"""
-def testEnterMulti():
-    numPeople = int(input("Please enter the number of people to enter in\n"))
-
-    while numPeople > 0:
-        print("Please enter the next person's information")
-        name = input("Please enter in the name\n")
-        num = input("Please enter in the phone number\n")
-        partySize = int(input("Please enter in the party size\n"))
-        print("Adding {} to the queue\n".format(name))
-        addPerson(name, num, partySize)
-        numPeople -= 1
-
-    printQueue()
-
-"""
-This is the testing function to test out the creation of the table list
-"""
-def testTableStuff():
-    tableCount = int(input("Please enter the number of tables you plan to test"))
-    while tableCount > 0:
-        print("Please enter the next table's information")
-        tableID = input("Please enter in the table's ID\n")
-        seatCount = input("Please enter the seat count for the table\n")
-        status = input("Please enter the table's status\n")
-        print(f"Adding Table {tableID} to the table list\n")
-        addTable(tableID, seatCount, status)
-        tableCount -= 1
-
-    printTableList()
-
-"""
-This function is used to test out the two case of check can sit
-"""
-
-def testCheckCanSit(table1, cust1, table2, cust2):
-    print(f"Testing the check can sit function with table: {table1.getID()} and customer: {cust1.getName()}")
-    if checkCanSit(table1, cust1):
-        print(f"The first go around of function returned true, test one passed.")
-    else:
-        print(f"The first go around of the function returned false, test failed.")
-    print(f"Testing the check can sit function with table: {table2.getID()} and customer: {cust2.getName()}")
-    if not checkCanSit(table2, cust2):
-        print(f"The second go around of the function returned false, test two passed.")
-    else:
-        print(f"The second go around of the function returned true, test two failed.")
 
 """
 Finds a table based on the the submitted ID to search for
@@ -221,10 +160,10 @@ Function that will set an available table to the waiting state because a new cus
 @:param     tableID     the table ID that corresponds to the table that needs to be updated
 @:return    the table the was found
 """
-def setTableWaiting(tableID):
+def setTableInUse(tableID):
     tempTable = FindTableInList(tableID)
     print(f"Setting table {tempTable.getID()} to waiting...")
-    tempTable.changeWaitingForCust()
+    tempTable.changeInUse()
     print(f"New status for {tempTable.getID()} is {tempTable.getStatus()}")
     return tempTable
 
@@ -350,7 +289,7 @@ def main():
             print(f"Looking at the available tables for {savedCust.getName()}")
             tempTableID = tableMarker(savedCust, tempAvaList)
             if tempTableID != -1:
-                tempTable = setTableWaiting(tempTableID)
+                tempTable = setTableInUse(tempTableID)
                 table_col_ref.document(str(tempTable.getID())).update({"strState": tempTable.getStatus()})
                 print("Update was made")
                 print("Attempting to send an email to the customer...")
