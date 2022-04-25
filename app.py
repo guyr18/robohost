@@ -3,7 +3,7 @@ from firebase_admin import credentials, firestore;
 from flask import Flask, jsonify, request, render_template
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from _thread import start_new_thread
+from threading import Thread
 import RoboQueue
 import os
 
@@ -201,7 +201,10 @@ def render_cust_info():
 @app.route('/custConfirm', methods=['GET', 'POST'])
 def render_cust_confirm():
     return render_template('custConfirm.html')
-    
+
+robothread = Thread(target=RoboQueue.main)
+robothread.daemon = True
+robothread.start()
+
 if __name__ == '__main__':
-    socketIO_.run(app, debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
-robothread = start_new_thread(RoboQueue.main, ())
+    socketIO_.run(app, use_reloader=False, debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))

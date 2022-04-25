@@ -22,13 +22,14 @@ savedCust = -1
 # Subject constants
 CONFIRM_SUBJECT = "RoboHost - Table Confirmation"
 TABLE_SUBJECT = "RoboHost - Table Ready"
+
+print("Before try.")
 emailServer = smtplib.SMTP('smtp.gmail.com', 587)
 emailServer.starttls()
 roboEmail = "robohostnoreply@gmail.com"
 roboPass = "Csci4230!"
 emailServer.login(roboEmail, roboPass)
-
-
+print("After try")
 
 """
 Function to add a person to the queue
