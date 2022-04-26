@@ -11,11 +11,18 @@ class PersonalInfo(object):
     These will be given by the submitted data
     """
 
-    def __init__(self, name, email, partySize):
+    def __init__(self, docId, name, email, partySize):
+        self.docId = docId
         self.name = name
         self.email = email
         self.partySize = partySize
 
+    """
+    Simple get function to a return a document id if needed
+    """
+    def getDocId(self):
+        return self.docId
+        
     """
     Simple get function to return a name if needed
     """

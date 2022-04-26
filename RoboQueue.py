@@ -25,24 +25,22 @@ savedCust = -1
 # Subject constants
 CONFIRM_SUBJECT = "RoboHost - Table Confirmation"
 TABLE_SUBJECT = "RoboHost - Table Ready"
-
-print("Before try.")
 emailServer = smtplib.SMTP('smtp.gmail.com', 587)
 emailServer.starttls()
 roboEmail = "robohostnoreply@gmail.com"
 roboPass = "Csci4230!"
 emailServer.login(roboEmail, roboPass)
-print("After try")
 
 """
 Function to add a person to the queue
 
+@param docId        Document id associated with this persons' document
 @param name         Name associated with a person
 @param number       Number associated with a person
 @param partySize    The party size that is associate with a person
 """
-def addPerson(name, number, partySize):
-    tempPerson = PerInfo.PersonalInfo(name, number, partySize)
+def addPerson(docId, name, number, partySize):
+    tempPerson = PerInfo.PersonalInfo(docId, name, number, partySize)
     q.put(tempPerson)
 
 """
@@ -72,7 +70,7 @@ def testEnterSingle():
     num1 = input("Please enter person 1's number\n")
     ps1 = int(input("Please enter person 1's party size\n"))
 
-    addPerson(name1, num1, ps1)
+    addPerson(None, name1, num1, ps1)
 
     printQueue()
 
@@ -88,7 +86,7 @@ def testEnterMulti():
         num = input("Please enter in the phone number\n")
         partySize = int(input("Please enter in the party size\n"))
         print("Adding {} to the queue\n".format(name))
-        addPerson(name, num, partySize)
+        addPerson(None, name, num, partySize)
         numPeople -= 1
 
     printQueue()
@@ -267,6 +265,21 @@ def sendTableInfoEmail(cust, table):
 
         emailServer.sendmail(roboEmail, custEmail, message)
         print("Customer table assign email sent...")
+
+        # Remove this document from the custInfo collection. We're done with it.
+        db = firestore.client()
+        colCust = db.collection("custInfo")
+        docId = cust.getDocId()
+        docRef = colCust.document(docId)
+        docSnapShot = docRef.get()
+
+        if docSnapShot.exists:
+
+            colCust.document(docId).delete()
+
+        else:
+            print("Something went wrong! Couldn\'t delete document.")
+
     except BaseException as error:
         print(f"Something didn't work...\n{error=}, {type(error)=}")
 
@@ -285,7 +298,7 @@ def on_snapshot_cust_info(col_snapshot, changes, readtime):
             print(f"New document {change.document.id} was added to the database")
             print(f"Information for {change.document.id}\nName: {name}\nEmail: {email}\nParty Size: {partySize}")
             print(f"Adding {name} to the queue...")
-            addPerson(name, email, partySize)
+            addPerson(change.document.id, name, email, partySize)
             print(f"{name} has been added to the queue.")
             print(f"New queue size {q.qsize()}\n")
             print("Attempting to send email...")
@@ -369,7 +382,7 @@ def main(s):
 
                 # Broadcast this state change to the employee and manager views.
                 passedSocketIO.emit('update_state_recv', {'tableId': tempTable.getID(), 'strState': tempTable.getStatus()}, broadcast=True)
-                
+
                 print("Update was made")
                 print("Attempting to send an email to the customer...")
                 sendTableInfoEmail(savedCust, tempTable)
