@@ -5,7 +5,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from time import sleep
 from wait import computeWaitTime
-import smtplib, ssl
+import smtplib
 
 # SocketIO instance used to broadcast messages.
 passedSocketIO = None

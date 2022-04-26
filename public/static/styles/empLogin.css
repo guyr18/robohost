@@ -23,7 +23,7 @@ body{
     width: 600px;
     height: 160px;
     left: 350px;
-    top: 0px;
+    top: -50px;
 
     font-family: Roboto;
     font-style: normal;
@@ -42,7 +42,7 @@ body{
     width: 700px;
     height: 80px;
     left: 300px;
-    top: 160px;
+    top: 100px;
 
     font-family: Roboto;
     font-style: italic;
@@ -190,4 +190,19 @@ img{
     height: 150px;
     left: 110px;
     top: 75px;
+}
+
+button
+{
+
+    width: 30%;
+    font-size: 21px;
+    color: #9DE0AD;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color:  #547980;
+    
 }
