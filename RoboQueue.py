@@ -7,6 +7,9 @@ from time import sleep
 from wait import computeWaitTime
 import smtplib, ssl
 
+# SocketIO instance used to broadcast messages.
+passedSocketIO = None
+
 # Queue object to hold all the awaiting customers
 q = Queue(maxsize=0)
 
@@ -312,7 +315,11 @@ def on_snapshot_table_info(col_snapshot, changes, readtime):
 """
 main function of this file
 """
-def main():
+def main(s):
+
+    # Save reference to SocketIO instance for use later.
+    global passedSocketIO
+    passedSocketIO = s
 
     print("Getting connection to FireStore database...")
     # Auth us into the firebase
@@ -359,6 +366,10 @@ def main():
             if tempTableID != -1:
                 tempTable = setTableWaiting(tempTableID)
                 table_col_ref.document(str(tempTable.getID())).update({"strState": tempTable.getStatus()})
+
+                # Broadcast this state change to the employee and manager views.
+                passedSocketIO.emit('update_state_recv', {'tableId': tempTable.getID(), 'strState': tempTable.getStatus()}, broadcast=True)
+                
                 print("Update was made")
                 print("Attempting to send an email to the customer...")
                 sendTableInfoEmail(savedCust, tempTable)
@@ -372,4 +383,4 @@ def main():
 Causes the main function to run if this script is running
 """
 if __name__ == "__main__":
-    main()
+    main(None)

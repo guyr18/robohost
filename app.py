@@ -178,10 +178,6 @@ def render_login():
 def render_how():
     return render_template('howTo.html')
 
-@app.route('/yourTables', methods=['GET', 'POST'])
-def render_tables():
-    return render_template('yourTables.html')
-
 @app.route('/cview', methods=['GET', 'POST'])
 def render_customer_view():
     return render_template('custView.html')
@@ -202,9 +198,9 @@ def render_cust_info():
 def render_cust_confirm():
     return render_template('custConfirm.html')
 
-robothread = Thread(target=RoboQueue.main)
+if __name__ == '__main__':
+    socketIO_.run(app, debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+
+robothread = Thread(target=RoboQueue.main, args=[socketIO_])
 robothread.daemon = True
 robothread.start()
-
-if __name__ == '__main__':
-    socketIO_.run(app, use_reloader=False, debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
