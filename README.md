@@ -71,3 +71,7 @@ flask run -h <host_name> <port_number>
 
 Where **<host_name>** is the targeted host and **<port_number>** is the port that you would like the server
 to listen on.
+
+Lastly, you may navigate to the index page of our application at the following URL:  
+
+http://<host_name>:<port_number>  
