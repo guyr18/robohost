@@ -1,6 +1,6 @@
 ## RoboHost - ReadMe
 
-Group Members: 
+Group Members:         
 Jaicie Smallwood  
 Miriam Harb  
 Adam Juwaied  
@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 ## Final Steps and Running RoboHost
 
-The repository contains a subdirectory that is labeled **RoboHost**. You will need to navigate to this directory.
+The repository contains a subdirectory that is labeled **robohost**. You will need to navigate to this directory.
 
 ```
 cd robohost
