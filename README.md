@@ -1,12 +1,12 @@
 ## RoboHost - ReadMe
 
-Group Members: Jaicie Smallwood  
-               Miriam Harb  
-               Adam Juwaied  
-               Robert Guy  
-               Brandon Woods  
-               Robert Johnson  
-
+Group Members: 
+Jaicie Smallwood  
+Miriam Harb  
+Adam Juwaied  
+Robert Guy  
+Brandon Woods  
+Robert Johnson  
 
 This document contains the sequence of steps for running RoboHost locally. It assumes that  
 you are running **Python 3.x** and have access to a **Linux** shell.
@@ -55,3 +55,13 @@ Lastly, you can run the application from here by issuing the following command:
 ```
 flask run
 ```
+
+By default, this runs the server on host - **127.0.0.1** and port - **5000**. If these configurations
+are occupied on your system you may need to modify this behavior. You can do that as follows:
+
+```
+flask run -h <host_name> <port_number>
+```
+
+Where **<host_name>** is the targeted host and **<port_number>** is the port that you would like the server
+to listen on.
