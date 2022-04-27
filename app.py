@@ -198,9 +198,19 @@ def render_cust_info():
 def render_cust_confirm():
     return render_template('custConfirm.html')
 
-if __name__ == '__main__':
-    socketIO_.run(app, debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+@app.route('/404', methods=['GET', 'POST'])
+@app.errorhandler(404)
+def render_404(e):
+    return render_template('404.html')
 
-robothread = Thread(target=RoboQueue.main, args=[socketIO_])
-robothread.daemon = True
-robothread.start()
+if __name__ == '__main__':
+    # GCR Dockerfile will run "python app.py" - Therefore this section will be executed.
+    robothread = Thread(target=RoboQueue.main, args=[socketIO_])
+    robothread.daemon = True
+    robothread.start()
+    socketIO_.run(app, debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+else:
+    # If local, this will be executed - assuming you use "flask run [params]"
+    robothread = Thread(target=RoboQueue.main, args=[socketIO_])
+    robothread.daemon = True
+    robothread.start()
