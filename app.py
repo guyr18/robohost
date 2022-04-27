@@ -20,7 +20,7 @@ objData = {} # This is the object to send back to JS.
 
 # SocketIO event handlers
 @socketIO_.on('connect')
-def connect_handler(auth):
+def connect_handler():
     print("Client connected")
 
 @socketIO_.on('disconnect')

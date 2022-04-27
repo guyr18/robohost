@@ -31,7 +31,7 @@
         const MAX_TABLES = 25; // Maximum number of tables allowed to be rendered to DOM.
 
         // Color map for assigning table colors.
-        var colorStateMap = {"Idle": "#5FAAF0", "default": "#5FAAF0", "Available": "#9FE15C", "In Use": "#C4C4C4", "Needs to Be Cleaned": "#F16464"};
+        var colorStateMap = {"Waiting for Customer": "#5FAAF0", "Available": "#9FE15C", "In Use": "#C4C4C4", "Needs to Be Cleaned": "#F16464"};
 
         function getCookie(cname) 
         {
@@ -190,14 +190,6 @@
             });
 
             let curState = objTableData[key].strState;
-
-            if(curState == "default")
-            {
-
-                curState = "Idle";
-
-            }
-
             let filter = 'select option[value="' + curState + '"]';
             console.log(filter);
             $('.tableInfo').show();

@@ -4,6 +4,10 @@
 
 <head> 
     <link rel="stylesheet" href="{{ url_for('static',filename='styles/custInfo.css') }}">
+
+      <!-- JQuery-->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      
     <title>Customer Check In</title>
     <meta charset="UTF-8">
 </head>
@@ -50,6 +54,44 @@
 <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-firestore.js"></script>
 <script type="text/javascript">
 
+function getCookie(cname) 
+{
+
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+
+  for(let i = 0; i < ca.length; i++)
+  {
+
+    let c = ca[i];
+
+    while (c.charAt(0) == ' ') 
+    {
+
+        c = c.substring(1);
+
+    }
+
+    if (c.indexOf(name) == 0) 
+    {
+
+      return c.substring(name.length, c.length);
+
+    }
+  }
+
+  return "";
+
+}
+
+function deleteCookie(cname) 
+{
+
+  document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+}
+
 // https://www.w3schools.com/js/js_cookies.asp
 function setCookie(cname, cvalue, exdays) 
 {
@@ -60,6 +102,23 @@ function setCookie(cname, cvalue, exdays)
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 
 }
+
+$(document).ready(() => {
+
+  if(getCookie("confirmed") != "")
+  {
+
+    deleteCookie("confirmed");
+
+  }
+
+  if(getCookie("custEmail") != "")
+  {
+
+    deleteCookie("custEmail");
+
+  }        
+});
 
 (function() {
 

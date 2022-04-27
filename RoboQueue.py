@@ -36,11 +36,11 @@ Function to add a person to the queue
 
 @param docId        Document id associated with this persons' document
 @param name         Name associated with a person
-@param number       Number associated with a person
+@param email        Email associated with a person
 @param partySize    The party size that is associate with a person
 """
-def addPerson(docId, name, number, partySize):
-    tempPerson = PerInfo.PersonalInfo(docId, name, number, partySize, len(q.queue) + 1)
+def addPerson(docId, name, email, partySize):
+    tempPerson = PerInfo.PersonalInfo(docId, name, email, partySize)
     q.put(tempPerson)
 
 """
@@ -244,13 +244,11 @@ def sendWaitEmail(custName, custEmail):
 
     try:
 
-        content = "Hey there " + custName + ". You have been added to the queue. Your current wait time is " + \
+        content = "Hey there, " + custName + ". You have been added to the queue. Your current wait time is " + \
                     str(computeWaitTime(q)) + " minutes."
         message = 'Subject: {}\n\n{}'.format(CONFIRM_SUBJECT, content)
         emailServer.sendmail(roboEmail, custEmail, message)
         print("Customer added email sent...")
-        print(f"POS: {q.queue[q.qsize() - 1].queuePos}")
-        passedSocketIO.emit('queue_pos_recv', {'pos': q.queue[q.qsize() - 1].queuePos, 'custEmail': custEmail}, broadcast=True)
     except BaseException as error:
         print(f"Something didn't work...\n{error=}, {type(error)=}")
 
@@ -383,9 +381,6 @@ def main(s):
             if tempTableID != -1:
                 tempTable = setTableWaiting(tempTableID)
                 table_col_ref.document(str(tempTable.getID())).update({"strState": tempTable.getStatus()})
-
-                # Unicast message to socket client to inform them that they have been serviced.
-                passedSocketIO.emit('queue_pos_recv', {'pos': "DONE", 'custEmail': savedCust.getEmail()}, broadcast=True)
 
                 # Brief delay to ensure rendering time before broadcasting subsequent message.
                 sleep(q.qsize() + 2)
