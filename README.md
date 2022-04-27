@@ -9,7 +9,7 @@ Brandon Woods
 Robert Johnson  
 
 This document contains the sequence of steps for running RoboHost locally. It assumes that  
-you are running **Python 3.x** and have access to a **Linux** shell.
+you are running **Python 3.x**, have **git** installed and have access to a **Linux** shell.
 
 ## Cloning RoboHost
 
@@ -17,6 +17,12 @@ The first step towards cloning RoboHost is to make an empty directory (name is n
 
 ```
 mkdir robohost_local
+```
+
+Secondly, you will need to initialize an empty repository git repository.
+
+```
+git init
 ```
 
 Next, you will need to clone the **backend** branch from the GitLab repository.
