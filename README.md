@@ -19,7 +19,7 @@ The first step towards cloning RoboHost is to make an empty directory (name is n
 mkdir robohost_local
 ```
 
-Secondly, you will need to initialize an empty repository git repository.
+Secondly, you will need to initialize an empty repository using git.
 
 ```
 git init
