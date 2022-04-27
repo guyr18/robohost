@@ -66,7 +66,7 @@ By default, this runs the server on host - **127.0.0.1** and port - **5000**. If
 are occupied on your system you may need to modify this behavior. You can do that as follows:
 
 ```
-flask run -h <host_name> <port_number>
+flask run -h <host_name> -p <port_number>
 ```
 
 Where **<host_name>** is the targeted host and **<port_number>** is the port that you would like the server
