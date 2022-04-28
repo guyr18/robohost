@@ -196,7 +196,7 @@ def render_cust_info():
     
 @app.route('/custConfirm', methods=['GET', 'POST'])
 def render_cust_confirm():
-    return render_template('custConfirm.html')
+    return render_template('custConfirm2.html')
 
 @app.route('/404', methods=['GET', 'POST'])
 @app.errorhandler(404)
