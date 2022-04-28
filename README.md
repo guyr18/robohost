@@ -25,10 +25,10 @@ Secondly, you will need to initialize an empty repository using git.
 git init
 ```
 
-Next, you will need to clone the **backend** branch from the GitLab repository.
+Next, you will need to clone the **main** branch from the GitLab repository.
 
 ```
-git clone -b backend https://gitlab.cs.ecu.edu/csci-4230-spring-2022/section-002/electronic-hostess/robohost.git
+git clone -b main https://gitlab.cs.ecu.edu/csci-4230-spring-2022/section-002/electronic-hostess/robohost.git
 ```
 
 ## Installing Dependencies
