@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "robohost-demo",
+  "private_key_id": "9cd87ea4114b8277a0b6982cea86615c84650812",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCumuuP/AobxgKc\nJYFgh5dEbsoA7MXUzh+8Zp8z2lYr/mU6nAugjD/t7qrKlUdmWubaUdrvu0YRsQS5\nSaMeDK0f05s6wJ4oPD+pk+clbQJ5Qm2cwiYx2x4AVwPoJfTBsQjLSoSrkcloS346\nmsKvDwnnSW1pFLLmjbRPpx6E5glyX2Z/6Cnaj4V5xBI/IBOChuwxmBwAeBWbNinn\npDWjTMz8LmTv2fDTQpebp8LoeL+sAf/6U1Lu9h9g+RHB1wlkgj6AsZ3KXgk3HceC\n/cNyfoj43Y2vV4VRnMhi9/hbvZwcX7lLQIICtr2PoP/iKxC4szayCknWKko1AV3n\n8J63PVA5AgMBAAECggEAIShXUpUE4GhWZ4uxyYCGR98YKlvMZ9Cq8y6zzfeJBLq/\nQ4WNqbPokgkQUv9NO1FI5K3Fu1/few2YPY2P1e2HVPNs15frkO18E3p8Wz2byiZE\nxY+TDEW1qU/c9JF8rOmvJ1fj4OcDDfTEKGHqVa8v7MWjauCc5q6DTtsILym2IotN\noYU68QGGzOAzpUbnLJ9zyQOdFiaD/hW12cofM4W1uAMwpLmnHnw1Pi6fmuh4qIek\nGUI6cxyZbbc86ufdinXojnIbSRxNguSoyhxe/KdMYf3bILE2q+fSM1PZ53G5HeY5\nUuglbqo51MTNiKJIpN9EOl8+bb9P5MDycoRjOXn5mQKBgQDqsCDsOVdNk8UaWoFc\nuLCfodN9jF90erNd9ZZUYAfF39z6X/xuA2QaALCkj4b35QwAbDVhHa/tg1pEoV0n\nOAk0r1QiqoKZacKUr5LYRxLVpyLrJbQUoEM/Od3bhK6Ac+QCtQFLIcCeEaQqdW7x\nNmr+gU30qQ2LGV81nvheCVzxpQKBgQC+dgZ7px0MvseirFxjWNMc1zLHH+cDK5qm\nBnsAlmIeXs+4oCvC4jsppGOTmrGh6IuJh0KyxlHgpm2tmdI198jb0RWIol64YNZd\ntUT8cpiiWoSGHqC/ldkl3h05ZR70qnDOhFy5knbZIjaWTtcv47O0ThQzQcpHngcm\nfwe/N2a4BQKBgF5DPgYDhghXyPwry/fFCtQjOIId5p0vR2n+4VGkfJrCrsw1z3sU\ni5lSG6ENMQXSjr6At/P465e3gYM9WOAOxsvNfDqsR+Z8rzXvS0jpSyxbhE/0hd8e\n+8OiZ3TrVverFLLtpsZZmTckGM8g+d2SoOj2YKxbVmA/YZl074c9tYItAoGAJpFR\n2MJLYKRVWryabMe04Fc3ghkUt5Ch3VLcn47USaAbYiCVG/6hylnujBo8NDQZ5XyN\nZhRAykQJW6kVZzZI5zJcsPFoSt/ZKNqnIJO4EtBPm7UiCgm3EjL7Kf8vGI5XD4rA\nGBfvlyKVeTR34Mu0PSO+dW6yHnSCsCnzEKaQV10CgYAPemvsVrg3ot+kxk/Bq4k5\nzdgnwE8RtD6rAzpxzdMMrim+YcwMhosJAbryjpjcfzcn/aXHag6uYfpiRBQ/sJWn\nsaYYuen8VomqoJRqKPip54Y3oPf18BnA7WVAMJFc6HP6sam8+jyTMXNPkBkbzI3W\nLw44rkn7CqXVVVsC69mfWA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-s071v@robohost-demo.iam.gserviceaccount.com",
+  "client_id": "102534738953055123544",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-s071v%40robohost-demo.iam.gserviceaccount.com"
+}

@@ -1,0 +1,124 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+/*The background of the page*/
+body{
+	background-color: #45ADA8;
+}
+
+/*Using this for the title of the web page*/
+h1{
+	font-family: "Roboto", Sans-Serif;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 75px;
+	text-align: center;
+	color: black;
+}
+
+/*This is the different colored rectangle that the colored boxes and information is on top of*/
+.rectangle{
+	position:absolute;
+    width: 1250px;
+    height: 500px;
+    left: 120px;
+	top: 200px;
+
+	background: #F7F7F7;
+	border: 1.5px solid #000000;
+	box-sizing: border-box;
+
+}
+
+
+/*Used for the needs cleaned color key*/
+.redTable{
+	position: absolute;
+	width: 214px;
+	height: 101px;
+	left: 25px;
+	top: 13px;
+
+	background: #F16464;
+	border: 1px solid #000000;
+	box-sizing: border-box;
+	border-radius: 25px;
+	
+	text-align: center;
+	font-family: "Roboto", Sans-Serif;
+	line-height: 90px;
+	font-size: 18px;
+	color: black;
+}
+
+/*Used for the available color key*/
+.greenTable{
+	position: absolute;
+	width: 214px;
+	height: 101px;
+	left: 25px;
+	top: 135px;
+
+	background: #9FE15C;
+	border: 1px solid #000000;
+	box-sizing: border-box;
+	border-radius: 25px;
+	
+	text-align: center;
+	font-family: "Roboto", Sans-Serif;
+	line-height: 90px;
+	font-size: 18px;
+	color: black;
+}
+
+/*Used for the waitin for customer table*/
+.blueTable{
+	position: absolute;
+	width: 214px;
+	height: 101px;
+	left: 25px;
+	top: 255px;
+
+	background: #5FAAF0;
+	border: 1px solid #000000;
+	box-sizing: border-box;
+	border-radius: 25px;
+	
+	text-align: center;
+	font-family: "Roboto", Sans-Serif;
+	line-height: 90px;
+	font-size: 18px;
+	color: black;
+}
+
+/*Used for the in use tables*/
+.greyTable{
+	position: absolute;
+	width: 214px;
+	height: 101px;
+	left: 25px;
+	top: 375px;
+
+	background: #C4C4C4;
+	border: 1px solid #000000;
+	box-sizing: border-box;
+	border-radius: 25px;
+	
+	text-align: center;
+	font-family: "Roboto", Sans-Serif;
+	line-height: 90px;
+	font-size: 20px;
+	color: black;
+}
+
+/*Holds the block of information that is used to inform staff of how things work*/
+.Info_Block{
+	position: absolute;
+	width: 600px;
+	left: 500px;
+	top: 100px;
+	text-align: center;
+	font-family: "Roboto", Sans-Serif;
+	font-size: 20px
+}

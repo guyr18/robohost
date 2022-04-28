@@ -1,0 +1,112 @@
+ /* Home Screen */
+ body{
+    position: static;
+    width: 1920px;
+    height: 1080px;
+    left: 0px;
+    top: 0px;
+    background-color: #45ADA8;
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 0px 0px;
+}
+.welcome{
+    /* Welcome to RoboHost */
+    position: absolute;
+    width: 1109px;
+    height: 253px;
+    left: 237px;
+    top: 200px;
+
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 144px;
+    line-height: 169px;
+
+    -webkit-text-stroke: 1px white;
+
+    color: rgba(0, 0, 0, 0.25);
+
+}
+img{
+    /* pngwing 1 */
+
+    position: absolute;
+    width: 890px;
+    height: 899px;
+    left: 1030px;
+    top: 181px;
+
+    background: url(pngwing.png);
+}
+/* Rectangle 1 */
+.custViewButton{
+    position: absolute;
+    width: 383px;
+    height: 104px;
+    left: 193px;
+    top: 717px;
+    font-size: 48px;
+
+    background: #547980;
+    border: 1px solid #9DE0AD;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 48px;
+}
+.empViewButton{
+    /* Rectangle 2 */
+    position: absolute;
+    width: 383px;
+    height: 104px;
+    left: 611px;
+    top: 717px;
+    font-size: 48px;
+
+    background: #9DE0AD;
+    border: 1px solid #E5FCC2;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+.circle1{
+    /* Ellipse 20 */
+    position: absolute;
+    background-color: #E5FCC2;
+    border-color: white;
+    border-radius: 50%;
+    border-width: 5px;
+    width: 366px;
+    height: 353px;
+    left: -24px;
+    top: -127px;
+}
+.circle2{
+   /* Ellipse 19 */
+    position: absolute;
+    width: 1100px;
+    height: 1060px;
+    left: 994px;
+    top: 181px;
+    border-radius: 50%;
+    border-width: 5px;
+
+    background: rgba(229, 252, 194, 0.17);
+}
+.desc{
+    /* Your automated hosting assistant */
+    position: absolute;
+    width: 728px;
+    height: 143px;
+    left: 237px;
+    top: 587px;
+
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 48px;
+    line-height: 56px;
+    color: #FFFFFF;
+}

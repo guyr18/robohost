@@ -1,0 +1,80 @@
+<!--how to use application-->
+<!DOCTYPE HTML>
+<!--how to use web page  part of the RoboHost application-->
+<html>
+	<head>
+		<title>How to Use - RoboHost</title>
+		
+		<!--How to page uses the how to stylesheet-->
+		<link rel="stylesheet" href="{{ url_for('static',filename='styles/howTo.css') }}">
+	</head>
+	<body>
+
+	<script>
+
+	 // Check that user has correct cookies to access this page.
+
+	 function getCookie(cname) 
+     {
+
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+
+            for(let i = 0; i <ca.length; i++)
+            {
+
+                let c = ca[i];
+
+                while (c.charAt(0) == ' ') 
+                {
+
+                    c = c.substring(1);
+                }
+
+                if (c.indexOf(name) == 0) 
+                {
+
+                    return c.substring(name.length, c.length);
+
+                }
+            }
+
+            return "";
+
+		}
+
+	// If either is missing, this user does not belong on this web page.
+
+	if(getCookie("strName") == "" || getCookie("accessLevel") == "")
+    {
+
+        location.href = "employeeLogin";
+
+    }
+
+	</script>
+		<!--The display title of the site-->
+		<h1>HOW TO USE</h1>
+		
+		<!--The Gray rectangle that holds all the the information. Everything that we want in the rectangle needs to be inside this div-->
+		<div class="rectangle">
+			
+			<!--These are the colored blocks-->
+			<div class="redTable">Needs to be cleaned</div>
+			<div class="greenTable">Available</div>
+			<div class="blueTable">Waiting for customer</div>
+			<div class="greyTable">In Use</div>
+			
+			
+			<!--This block of information that holds what is actually done. The span area changes just the stlye of the phrases between them.-->
+			<div class="Info_Block">
+				<p>
+					There are 4 colors that each represent the current status of the tables in the resturaunt. When you want to change the status of a table, simply tap!<br>
+					For example: If you want to signal a Buser to let them know that a table needs to be cleaned <span style="color: #9D9C9C">(Current status should be In Use)</span>, simply tap on the table to Red <span style="color: #F16464">(Needs to be cleaned)</span>.<br>
+					If the table is <span style="color: #5FAAF0">Blue</span>, this indicates that the table is currently waiting for the next customer to arrive to their table. If they do not arrive within 5 minutes, the status should be changed to <span style="color: #9FE15C">Available</span>, and it cna be switched to <span style="color: #5FAAF0">Blue</span> again when the next customer has been moved up the waiting list.
+				</p>
+			</div>
+		</div>
+	</body>
+</html>

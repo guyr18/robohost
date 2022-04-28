@@ -1,0 +1,707 @@
+<!-- Manager View page-->
+
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>
+            Employee View
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> 
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles/managerView.css') }}">
+        <script src="https://unpkg.com/konva@8.3.3/konva.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+
+        <script> 
+
+        var tables = {}; // Table reference cache.
+        var objTableData = {}; // Table data cache.
+        var selectedTableKey = null; // Currently selected data key.
+        var tableCount = 0; // Running counter of tables; 
+        var tailTable = null; // Last table added to tables.
+        var stage = null; // Reference to root layer used by Konva.
+        var globalLayer = new Konva.Layer(); // Globalized layer to avoid excessive layer creation.
+        var lastTableDeleted = null; // Reference to last table deleted.
+        const MAX_TABLES = 25; // Maximum number of tables allowed to be rendered to DOM.
+
+        // Color map for assigning table colors.
+        var colorStateMap = {"Waiting for Customer": "#5FAAF0", "Available": "#9FE15C", "In Use": "#C4C4C4", "Needs to Be Cleaned": "#F16464"};
+
+        function getCookie(cname) 
+        {
+
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+
+            for(let i = 0; i < ca.length; i++)
+            {
+
+                let c = ca[i];
+
+                while (c.charAt(0) == ' ') 
+                {
+
+                    c = c.substring(1);
+                }
+
+                if (c.indexOf(name) == 0) 
+                {
+
+                    return c.substring(name.length, c.length);
+
+                }
+            }
+
+            return "";
+
+        }
+
+        function deleteCookie(cname) 
+        {
+
+            document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        }
+
+        function logout()
+        {
+
+            deleteCookie("strName");
+
+        }
+
+        // If either is missing, this user does not belong on this web page.
+        if(getCookie("strName") == "" || getCookie("accessLevel") == "")
+        {
+
+            location.href = "employeeLogin";
+
+        }
+  
+        // FillTables(src) renders tables to the DOM as Konva Group objects. 
+        function fillTables(src)
+        {
+
+            // Store constants that represent the width and height of
+            // a window.
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            // Initialize the Konva Stage object to a div id with a name
+            // of container and the windowWidth and windowHeight constants.
+            stage = new Konva.Stage({
+
+                container: "container",
+                width: windowWidth,
+                height: windowHeight,
+
+            });
+
+            const itemsPerRow = 5; // The number of items per row.
+            const usedRows = Math.ceil(src.length / itemsPerRow); // The number of rows that will be needed.
+            let slotsLeft = src.length; // How many slots are left for the algorithm to fill.
+            
+            for(let i = 0; i < usedRows; i++)
+            {
+
+               
+                const colLimit = slotsLeft > 5 ? 5 : slotsLeft;
+                let prevBox = null;
+
+                for(let j = 0; j < colLimit; j++, tableCount++)
+                {
+
+                    const posX = j == 0 ? 100 : prevBox.position().x + 200;
+                    const posY = i * 100;
+                    
+                    let box = new Konva.Group({
+
+                        name: src[i * itemsPerRow + j].tableId,
+                        x: posX,
+                        y: posY,
+                        width: 100,
+                        height: 50,
+                        draggable: false,
+
+                    });
+
+                    var surface = new Konva.Rect({
+
+                        width: 100,
+                        height: 50,
+                        fill: "#00D2FF",
+                        stroke: "black",
+                        strokeWidth: 4,
+
+                    });
+
+                    box.add(surface);
+                    box.add(new Konva.Text({
+
+                        text: box.name(),
+                        fontSize: 18,
+                        fill: "#000",
+                        align: 'center',
+                        width: 75,
+                        padding: 20,
+                        x: 12,
+
+                    }));
+
+                    surface.fill(colorStateMap[objTableData[box.name()].strState]);
+                    box.on("click", () => {
+
+                        showTableProps(box.name());
+
+                    });
+
+                    prevBox = box;
+                    tables[src[i * itemsPerRow + j].tableId] = box;
+                    globalLayer.add(box);
+                    stage.add(globalLayer);
+
+                    if(i == usedRows - 1 && j == colLimit - 1) { tailTable = box; }
+
+                }
+
+                slotsLeft -= colLimit;
+
+            }
+        }
+
+        // ShowTableProps(key) shows the table modal for displaying table-relative attributes. It takes a
+        // key as input that represents the table id.
+        function showTableProps(key)
+        {
+
+            console.log("showTableProps()");
+            selectedTableKey = key;
+            $('.propText').text(() => {
+                
+                return ("Currently viewing Table [ID = " + key.toString() + "]");
+
+            });
+
+            let curState = objTableData[key].strState;
+            let filter = 'select option[value="' + curState + '"]';
+            console.log(filter);
+            $('.tableInfo').show();
+            $('option:selected').attr('selected', false);
+            $(filter).attr("selected",true);
+            $('.vnsInput').val(objTableData[key].numSeats.toString());
+            $('.suidInput').val(objTableData[key].sectionUid.toString());
+
+        }
+
+        // AddTable(tableId) adds a table to the tables dictionary with the key tableId. It
+        // renders the table based on specified attributes to the DOM.
+        function addTable(tableId)
+        {
+
+            // If the maximum number of tables have been reached, show an alert and return the function.
+            if(tableCount == MAX_TABLES)
+            {
+
+                alert("Max tables reached, can\'t add anymore.");
+                return;
+
+            }
+
+            let posX = undefined;
+            let posY = undefined;
+            let recentlySet = lastTableDeleted != null;
+
+            // If a table was recently deleted, that means their is an empty slot, we can fill it instead of
+            // using more space.
+            if(lastTableDeleted != null)
+            {
+
+                posX = lastTableDeleted.position().x;
+                posY = lastTableDeleted.position().y;
+                lastTableDeleted = null;
+
+                // Find new tail table
+                let largestX = undefined;
+                let largestY = undefined;
+                let newKey = undefined;
+
+                // Find largest Y value among tables; this gives an idea of where
+                // the tables on the last row are located.
+                for(key in tables)
+                {
+
+                    largestY = largestY == undefined ? tables[key].position().y : Math.max(largestY, tables[key].position().y);
+
+                }
+
+                // Search for the table on the final row that is furthest to the right.
+                for(key in tables)
+                {
+
+                    // If this table is on the final row, then do enter this branch.
+                    if(tables[key].position().y == largestY)
+                    {
+
+                        // If no table has been set for this row, take the first one we see. Otherwise, check that
+                        // this table is further to the right than the previous one. If it is, we update the key
+                        // to the one found here.
+                        if((largestX == undefined && newKey == undefined) || (tables[key].position().x > largestX))
+                        {
+
+                            largestX = tables[key].position().x;
+                            newKey = key;
+
+                        }
+                    }
+                }
+
+                // Update the tail table to the newly found Konva object.
+                tailTable = tables[newKey];
+
+            } 
+            else
+            {
+
+                // Conditionals indicate: does adding a new item require a new row? If so,
+                // offset coordinates accordingly.
+                const itemsPerRow = 5;
+                posX = (tableCount + 1) % itemsPerRow == 1 ? 100 : tailTable.position().x + 200;
+                posY = (tableCount + 1) % itemsPerRow == 1 ? tailTable.position().y + 100 : tailTable.position().y;
+
+            }
+
+            let box = new Konva.Group({
+                
+                name: tableId.toString(),
+                x: posX,
+                y: posY,
+                width: 100,
+                height: 50,
+                draggable: true,
+
+            });
+
+            var surface = new Konva.Rect({
+
+                width: 100,
+                height: 50,
+                fill: '#00D2FF',
+                stroke: 'black',
+                strokeWidth: 4,
+
+            });
+
+            box.add(surface);
+            box.add(new Konva.Text({
+
+                text: box.name(),
+                fontSize: 18,
+                fill: "#000",
+                align: 'center',
+                width: 75,
+                padding: 20,
+                x: 12,
+
+            }));
+
+            surface.fill(colorStateMap[objTableData[box.name()].strState]);
+            box.on("click", () => {
+
+                showTableProps(box.name());
+
+            });
+
+            tableCount++;
+
+            if(!recentlySet)
+            {
+
+                tailTable = box;
+                tailTable.position({x: posX, y: posY});
+
+            }
+
+            tables[tableId] = box;
+            globalLayer.add(box);
+            stage.add(globalLayer);
+                
+        }
+
+        </script>
+        <div id="myMenu" class="MenuLayer">
+            <a href="javascript:void(0)" class="closeMenuButton" onclick="toggleNav()"></a>
+            <div class="MenuLayerLinks">
+                <a href="/howTo">How To Use</a>
+                <a href="/employeeLogin" onclick="logout()">Logout</a>
+                <p class="employeeText">Employee: </p>
+            </div>
+            <script>
+            function toggleNav() {
+                var element = document.getElementById("myMenu");
+                if (element.style.width == "250px") {
+                    element.style.width = "0px";
+                } else {
+                    element.style.width = "250px";
+                }
+            }
+
+            $(document).ready(() => {
+
+
+                $(".employeeText").text(() => {
+                
+                    return "Employee: " + getCookie("strName");
+
+                });
+            
+                $('input:radio[name=add]').prop('checked', true);
+                $('.remSection').hide();
+                $('.tableInfo').hide();
+
+                // HANDLE web sockets for real-time
+                var socket = io.connect("");
+
+                socket.on('connect', () => {
+
+                    console.log("Client connected.");
+
+                });
+
+                socket.on('disconnect', () => {
+
+                    console.log("Client disconnected.");
+
+                });
+
+                socket.on('update_state_recv', (data) => {
+
+                    if(tables[data.tableId] != null && tables[data.tableId].strState != data.strState)
+                    {
+
+                        console.log("Multicast received [event_name=update_state_recv]");
+                        let surface = tables[data.tableId].getChildren()[0];
+                        surface.fill(colorStateMap[data.strState]);
+                        objTableData[data.tableId].strState = data.strState;
+
+                    }
+                });
+
+                socket.on('add_table_recv', (data) => {
+
+                    if(objTableData[data.tableId] == null && tables[data.tableId] == null)
+                    {
+
+                        console.log("Multicast received [event_name=add_table_recv]");
+                        objTableData[data.tableId] = {strState: data.strState, sectionUid: data.sectionUid, numSeats: data.numSeats};
+                        addTable(data.tableId, tables, new Konva.Layer());
+                        $('.numInput').val('').prop('placeholder');
+                        $('.seatInput').val('').prop('placeholder');
+                        $('.sectInput').val('').prop('placeholder');
+
+                    }
+                });
+
+                socket.on('rem_table_recv', (data) => {
+
+                    if(objTableData[data.tableId] != null)
+                    {
+
+                        console.log("Multicast received [event_name=rem_table_recv]");
+                        console.log("Table deleted successfully.");
+                        $('.remId').val('').prop('placeholder');
+
+                        // Find new tail table
+                        if(tailTable.name() == data.tableId.toString())
+                        {
+
+                            const n = tableCount;
+                            const onDiffRow = (n - 1) % 5 == 0;
+                            console.log(n);
+
+                            for(key in tables)
+                            {
+
+                                const xMatch = !onDiffRow ? tables[key].position().x == tailTable.position().x - 200 : tables[key].position().x == 900;
+                                const yMatch = !onDiffRow ? tables[key].position().y == tailTable.position().y : tables[key].position().y == (Math.ceil((n - 1) / 5) * 100) - 100;
+
+                                if(xMatch && yMatch)
+                                {
+
+                                    tailTable = tables[key];
+                                    break;
+
+                                }
+                            }
+                        }
+
+                        // Similarly, the synchronous block of code may be executed before the multicasted
+                        // socket message, making this a race condition. So, we check if this data exists
+                        // in the tables dictionary, if it does we will delete. If doesn't it will not be neccessary.
+                        if(tables[data.tableId] != null)
+                        {
+
+
+                            // Destroy and deallocate removed table.
+                            tableCount--;
+                            tables[data.tableId].destroy();
+                            delete tables[data.tableId];
+
+                        }
+                    }
+                });
+
+                fetch('/data_handler', {
+
+                headers: {
+
+                    'Content-Type': 'application/json'
+
+                },
+
+                method: 'POST',
+                
+                body: JSON.stringify({
+
+                    "intType": 0
+
+                })
+
+                }).then(function (response) {
+
+                    return response.json();
+
+                }).then(function (data) {
+
+                    return data.src;
+
+                }).then(function (tableData) {
+
+                    for(key in tableData)
+                    {
+
+                        const useKey = tableData[key].tableId.toString();
+                        objTableData[useKey] = {strState: "", numSeats: -1, sectionUid: -1};
+                        objTableData[useKey].strState = tableData[key].strState;
+                        objTableData[useKey].numSeats = tableData[key].numSeats;
+                        objTableData[useKey].sectionUid = tableData[key].sectionUid;
+
+                    }
+
+                    fillTables(tableData);
+
+                });
+
+                $('.confirmBtn').click(() => {
+
+                    console.log("Add table clicked");
+                    let tableId = $('.numInput').val();
+                    let numSeats = $('.seatInput').val();
+                    let sectId = $('.sectInput').val();
+                    let newState = $('.addSectStateInput option:selected').val();
+                    fetch('/add_table', {
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                        },
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+                            "tableId": tableId,
+                            "numSeats": numSeats,
+                            "sectionUid": sectId,
+                            "strState": newState,
+                    })
+
+                    }).then(function (response) { 
+                        return response.json();
+
+                    }).then(function (data) {
+
+                        objTableData[tableId] = {strState: newState, sectionUid: sectId, numSeats: numSeats};
+                        addTable(tableId, tables, new Konva.Layer());
+                        $('.numInput').val('').prop('placeholder');
+                        $('.seatInput').val('').prop('placeholder');
+                        $('.sectInput').val('').prop('placeholder');
+
+                    });
+                });
+
+                $('.confirmRemBtn').click(() => {
+
+                    let tableId = $('.remId').val();
+
+                    fetch('/remove_table', {
+
+                    headers: {
+
+                        'Content-Type': 'application/json',
+                    
+                    },
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+
+                        "tableId": tableId,
+
+                    })
+
+                    }).then(function (response) {
+
+                        return response.json();
+
+                    }).then(function (data) {
+
+                        let code = data.code;
+
+                        if(code == 0)
+                        {
+
+                            console.log("Invalid table ID specified");
+
+                        }
+                        else
+                        {
+
+                            console.log("Table deleted successfully.");
+                            $('.remId').val($('.remId').prop('placeholder'));
+
+                            // Find new tail table
+                            if(tailTable.name() == tableId.toString())
+                            {
+
+                                const n = tableCount;
+                                const onDiffRow = (n - 1) % 5 == 0;
+                                console.log(n);
+
+                                for(key in tables)
+                                {
+
+                                    const xMatch = !onDiffRow ? tables[key].position().x == tailTable.position().x - 200 : tables[key].position().x == 900;
+                                    const yMatch = !onDiffRow ? tables[key].position().y == tailTable.position().y : tables[key].position().y == (Math.ceil((n - 1) / 5) * 100) - 100;
+
+                                    if(xMatch && yMatch)
+                                    {
+
+                                        tailTable = tables[key];
+                                        break;
+
+                                    }
+                                }
+                            }
+
+                            // This is now a race condition - sometimes multicasted messages in execute this block
+                            // of code first, meaning it has already been deleted. So, we run a conditional to see
+                            // if it has been deleted or not. If it is has not been deleted yet, then we can delete it.
+                            if(tables[tableId] != null)
+                            {
+
+                                // Destroy and deallocate removed table.
+                                tableCount--;
+
+                                tables[tableId].destroy();
+                                delete tables[tableId];
+
+                            }
+                        }
+
+                    });
+                });
+
+                $('input:radio').change(function() {
+
+                    if(this.name == "add")
+                    {
+
+                        $('input:radio[name=sub]').prop('checked', false);
+                        $('.remSection').hide();
+                        $('.inputSection').show();
+
+                    }
+                    else
+                    {
+
+                        $('input:radio[name=add]').prop('checked', false);
+                        $('.inputSection').hide();
+                        $('.remSection').show();
+
+                    }
+                });
+
+                $('.updBtn').click(() => {
+
+                    fetch('/data_handler', {
+
+                    headers: {
+
+                        'Content-Type': 'application/json',
+
+                    },
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+
+                        "intType": 1,
+                        "tableId": selectedTableKey,
+                        "newState": $('.stateInputProp option:selected').val(),
+
+                    })
+
+                    }).then(function (response) {
+
+                        return response.json();
+
+                    }).then(function (data) {
+
+                        console.log(data.resp);
+                        console.log(data.newState);
+                        let surface = tables[selectedTableKey].getChildren()[0];
+                        surface.fill(colorStateMap[data.newState]);
+                        objTableData[selectedTableKey].strState = data.newState;
+                        
+                    });
+                });
+            });
+            
+
+            </script>
+        </div>
+    </head>
+    <body>
+
+        <div class="rectangle">
+            <div>
+                <div id="container"></div>
+                <div class="tablePropertyModal">
+                    <p class="propText">No Table Currently Selected.</p>
+                    <div class="tableInfo">
+                        <label class="infoState">
+                            <label for="stateInputProp">State:</label>
+                            <select class="stateInputProp">
+                                <option value="Idle">Idle</option>
+                                <option value="In Use">In Use</option>
+                                <option value="Available">Available</option>
+                                <option value="Needs to Be Cleaned">Needs to Be Cleaned</option>
+                            </select>
+                            <button class="updBtn">
+                                <p class="updTxt">Update</p>
+                            </button>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hamburgerButton">
+            <img src="{{ url_for('static',filename='images/hambutton.png') }}" alt="Hamburger Button" width="60" height="35" onclick="toggleNav()">
+        </div>
+    </body>
+</html>
