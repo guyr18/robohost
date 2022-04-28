@@ -1,0 +1,126 @@
+body{
+    /* Customer view */
+    position: static;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+
+    background: #45ADA8;
+    overflow: hidden;
+
+    /* Inside auto layout */
+
+   flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 0px 0px;
+}
+h1{
+    margin: auto;
+    font-size: 104px;
+    color:rgba(0, 0, 0, 0.25);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    top: 140px;
+    width: 1160px;
+    height: 160px;
+    font-style: normal;
+    font-weight: 500;
+    -webkit-text-stroke: 1px white;
+
+}
+
+.checkInButton{
+    /* Check In Button*/
+    display: block;
+    max-width: 300px;
+    margin-top: 50px;
+    margin-left:580px;
+    width: 492px;
+    height: 110px;
+    background: #9DE0AD;
+    font-size: 45px;
+
+    /* Check In Text*/
+
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 50px;
+    line-height: 84px;
+    text-align: center;
+
+    color: #547980;
+
+    border: 1px solid #E5FCC2;
+}
+
+.circle1{
+    /* Top Left Circle */
+    position: absolute;
+    background-color: #E5FCC2;
+    border-color: white;
+    border-radius: 50%;
+    border-width: 5px;
+    width: 366px;
+    height: 403px;
+    left: -200px;
+    top: 166px;
+}
+
+.circle2{
+    /* CV Bottom Right Ellipse */
+    position: absolute;
+    width: 800px;
+    height: 981px;
+    left: 815px;
+    top: 116px;
+    background: rgba(229, 252, 194, 0.18);
+    border-color: white;
+    border-radius: 50%;
+    border-width: 5px;
+}
+
+.roboImg{
+    position: absolute;
+    width: 650px;
+    height: 699px;
+    left: 780px;
+    top: 100px;
+}
+.inst{
+    /* CV Subtitle */
+
+    margin: auto;
+    color:rgb(255, 255, 255);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-style: italic;
+    text-align: center;
+    margin-top: -30px;
+    width: 510px;
+    height: 70px;
+    font-weight: 500;
+    font-size: 38px;
+}
+.circle3{
+    /* Middle left Circle */
+    position: absolute;
+    width: 264px;
+    height: 264px;
+    left: 298px;
+    top: 408px;
+    background: rgba(229, 252, 194, 0.25);
+    border-radius: 50%;
+    border-width: 5px;
+}
+
+/* Ellipse 18 *
+
+
+position: absolute;
+width: 264px;
+height: 264px;
+left: 298px;
+top: 408px;
+
+background: rgba(229, 252, 194, 0.25);

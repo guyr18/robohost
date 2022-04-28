@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<!--how to use web page  part of the RoboHost application-->
+<html>
+	<head>
+		<title>How to Use - RoboHost</title>
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		<!--How to page uses the how to stylesheet-->
+		<link rel="stylesheet" href="howTo.css">
+	</head>
+	<body>
+		<div id="myMenu" class="MenuLayer">
+            <a href="javascript:void(0)" class="closeMenuButton" onclick="toggleNav()"></a>
+            <div class="MenuLayerLinks">
+                <a href="howTo.html">How To Use</a>
+                <a href="yourTables.html">Your Tables</a>
+                <a href="#">Logout</a>
+                <a href="employeeView.html">Employee View</a>
+                <a > Employee: </a>
+            </div>
+
+            <script>
+
+            function toggleNav() {
+                var element = document.getElementById("myMenu");
+                if (element.style.width == "250px") {
+                    element.style.width = "0px";
+                } else {
+                    element.style.width = "250px";
+                }
+            }
+            </script>
+        </div>
+		<!--The display title of the site-->
+		<div><h1>HOW TO USE</h1></div>
+		
+		<!--The Gray rectangle that holds all the the information. Everything that we want in the rectangle needs to be inside this div-->
+		<div class="rectangle">
+			
+			<!--These are the colored blocks-->
+			<div class="redTable">Needs to be cleaned</div>
+			<div class="greenTable">Available</div>
+			<div class="blueTable">Waiting for customer</div>
+			<div class="greyTable">In Use</div>
+			
+			
+			<!--This block of information that holds what is actually done. The span area changes just the stlye of the phrases between them.-->
+			<div class="Info_Block">
+				<p>
+					There are 4 colors that each represent the current status of the tables in the resturaunt. When you want to change the status of a table, simply tap!<br>
+					For example: If you want to signal a Buser to let them know that a table needs to be cleaned <span style="color: #9D9C9C">(Current status should be In Use)</span>, simply tap on the table to Red <span style="color: #F16464">(Needs to be cleaned)</span>.<br>
+					If the table is <span style="color: #5FAAF0">Blue</span>, this indicates that the table is currently waiting for the next customer to arrive to their table. If they do not arrive within 5 minutes, the status should be changed to <span style="color: #9FE15C">Available</span>, and it cna be switched to <span style="color: #5FAAF0">Blue</span> again when the next customer has been moved up the waiting list.
+				</p>
+			</div>
+		</div>
+		<div class="hamburgerButton">
+            <img src="pics/hambutton.png" alt="Hamburger Button" width="60" height="35" onclick="toggleNav()">
+        </div>
+	</body>
+</html>
