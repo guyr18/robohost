@@ -180,7 +180,7 @@ def render_how():
 
 @app.route('/cview', methods=['GET', 'POST'])
 def render_customer_view():
-    return render_template('custView.html')
+    return render_template('cust_View.html')
 
 @app.route('/eview', methods=['GET', 'POST'])
 def render_employee_view():
@@ -192,7 +192,7 @@ def render_manager_view():
 
 @app.route('/custInfo', methods=['GET', 'POST'])
 def render_cust_info():
-    return render_template('custInfo.html')
+    return render_template('custInfo2.html')
     
 @app.route('/custConfirm', methods=['GET', 'POST'])
 def render_cust_confirm():
