@@ -198,13 +198,20 @@
 
             });
 
-            let curState = objTableData[key].strState;
+            let curState = null;
 
-            let filter = 'select option[value="' + curState + '"]';
-            console.log(filter);
+            for(keyRef in objTableData)
+            {
+
+                if(key == keyRef)
+                {
+
+                    curState = objTableData[keyRef].strState;
+                }
+            }
+
             $('.tableInfo').show();
-            $('option:selected').attr('selected', false);
-            $(filter).attr("selected",true);
+            $('.stateInputProp').val(curState);
             $('.vnsInput').val(objTableData[key].numSeats.toString());
             $('.suidInput').val(objTableData[key].sectionUid.toString());
 
@@ -351,6 +358,8 @@
             <a href="javascript:void(0)" class="closeMenuButton" onclick="toggleNav()"></a>
             <div class="MenuLayerLinks">
                 <a href="/howTo">How To Use</a>
+                <a href="/eview">Employee View</a>
+                <a href="/mview">Manager View</a>
                 <a href="/employeeLogin" onclick="logout()">Logout</a>
                 <p class="employeeText">Manager: </p>
             </div>
@@ -517,6 +526,40 @@
                     let tableId = $('.numInput').val();
                     let numSeats = $('.seatInput').val();
                     let sectId = $('.sectInput').val();
+
+                    if(tableId.length == 0 || numSeats.length == 0 || sectId.length == 0)
+                    {
+
+                        alert("One or more fields are missing!");
+                        return;
+
+                    }
+
+                    var stringIsNumber = (s) => {
+
+                        for(let i = 0; i < s.length; i++)
+                        {
+
+                            if(isNaN(parseInt(s[i])))
+                            {
+
+                                return false;
+
+                            }
+                        }
+
+                        return true;
+
+                    }
+
+                    if(!stringIsNumber(tableId) || !stringIsNumber(numSeats) || !stringIsNumber(sectId))
+                    {
+
+                        alert("One or more fields contain non-numeric characters!");
+                        return;
+
+                    }
+
                     let newState = $('.addSectStateInput option:selected').val();
                     fetch('/add_table', {
 
@@ -550,6 +593,39 @@
                 $('.confirmRemBtn').click(() => {
 
                     let tableId = $('.remId').val();
+
+                    if(tableId.length == 0)
+                    {
+
+                        alert("Please specify which table you would like to remove!");
+                        return;
+
+                    }
+
+                    var stringIsNumber = (s) => {
+
+                        for(let i = 0; i < s.length; i++)
+                        {
+
+                            if(isNaN(parseInt(s[i])))
+                            {
+
+                                return false;
+
+                            }
+                        }
+
+                        return true;
+
+                    }
+
+                    if(!stringIsNumber(tableId))
+                    {
+
+                        alert("Table ID must be a numerical value!");
+                        return;
+
+                    }
 
                     fetch('/remove_table', {
 
@@ -636,6 +712,7 @@
                     {
 
                         $('input:radio[name=sub]').prop('checked', false);
+                        $('.remId').val('');
                         $('.remSection').hide();
                         $('.inputSection').show();
 
@@ -644,6 +721,9 @@
                     {
 
                         $('input:radio[name=add]').prop('checked', false);
+                        $('.numInput').val('');
+                        $('.seatInput').val('');
+                        $('.sectInput').val('');
                         $('.inputSection').hide();
                         $('.remSection').show();
 
@@ -736,8 +816,8 @@
                                 <p class="updTxt">Update</p>
                             </button>
                         </label>
-                        <label class="viewNumSeats">No. of Seats</label><input class="vnsInput" type="text" value="" /> 
-                        <label class="viewSUID">Section UID</label><input class="suidInput" type="text" value="" /> 
+                        <label class="viewNumSeats">No. of Seats</label><input class="vnsInput" type="text" value="" readonly /> 
+                        <label class="viewSUID">Section UID</label><input class="suidInput" type="text" value="" readonly /> 
                     </div>
                 </div>
             </div>

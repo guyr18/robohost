@@ -244,7 +244,7 @@ def sendWaitEmail(custName, custEmail):
 
     try:
 
-        content = "Hey there, " + custName + ". You have been added to the queue. Your current wait time is " + \
+        content = "Hey there, " + custName + ". You have been added to the queue. Your estimated wait time is " + \
                     str(computeWaitTime(q)) + " minutes."
         message = 'Subject: {}\n\n{}'.format(CONFIRM_SUBJECT, content)
         emailServer.sendmail(roboEmail, custEmail, message)
