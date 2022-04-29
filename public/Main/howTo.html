@@ -30,14 +30,25 @@
                 } else {
                     element.style.width = "250px";
                 }
-            } 
+				$(document).ready(() => {
+
+
+			$(".employeeText").text(() => {
+
+				return "Employee: " + getCookie("strName");
+
+			});
+			 $('input:radio[name=add]').prop('checked', true);
+
+            })
+			}
 
             </script>
         </div>
 	</head>
 
 	<body>
-            <script>
+    <script>
 	 function getCookie(cname) 
      {
 
