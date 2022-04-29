@@ -61,7 +61,7 @@ class TableInfo(object):
     A special set function that will change the status of a table object to Waiting for Customer
     """
     def changeWaitingForCust(self):
-        self.status = "Waiting for Customer"
+        self.status = "In Use"
 
     """
     A function to determine if a person can sit at this table based on if their party size can fit within the table's set count

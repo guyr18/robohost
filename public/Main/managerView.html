@@ -30,7 +30,7 @@
         const MAX_TABLES = 25; // Maximum number of tables allowed to be rendered to DOM.
 
         // Color map for assigning table colors.
-        var colorStateMap = {"Waiting for Customer": "#5FAAF0",  "Available": "#9FE15C", "In Use": "#C4C4C4", "Needs to Be Cleaned": "#F16464"};
+        var colorStateMap = {"Available": "#9FE15C", "In Use": "#C4C4C4", "Needs to Be Cleaned": "#F16464"};
 
         function getCookie(cname) 
         {
@@ -378,7 +378,7 @@
                 $('.tableInfo').hide();
 
                 // HANDLE web sockets for real-time
-                var socket = io.connect("");
+                var socket = io.connect("http://127.0.0.1:" + location.port);
 
                 socket.on('connect', () => {
 
@@ -709,7 +709,6 @@
                             <label class="numSections">Section UID<input class="sectInput" type="text" placeholder="Enter Section Identifier" /></label>
                             <label for="addSectStateInput">Table State</label>
                                 <select class="addSectStateInput">
-                                    <option value="Idle">Idle</option>
                                     <option value="In Use">In Use</option>
                                     <option value="Available">Available</option>
                                     <option value="Needs to Be Cleaned">Needs to Be Cleaned</option>
@@ -729,7 +728,6 @@
                         <label class="infoState">
                             <label for="stateInputProp">State:</label>
                             <select class="stateInputProp">
-                                <option value="Idle">Idle</option>
                                 <option value="In Use">In Use</option>
                                 <option value="Available">Available</option>
                                 <option value="Needs to Be Cleaned">Needs to Be Cleaned</option>

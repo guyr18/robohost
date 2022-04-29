@@ -22,7 +22,7 @@ objData = {} # This is the object to send back to JS.
 @socketIO_.on('connect')
 def connect_handler():
     print("Client connected")
-
+    
 @socketIO_.on('disconnect')
 def disconnect_handler():
     print("Client disconnected.")
