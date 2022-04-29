@@ -85,6 +85,16 @@
         function authLogin()
         {
 
+            let username = document.querySelector("input[name=usr]").value;
+            let password = document.querySelector("input[name=pwd]").value;
+
+            if(username.length == 0 || password.length == 0)
+            {
+
+                alert("Please fill out all fields to login!");
+                return;
+                
+            }
 
             fetch('/auth_login', {
 
@@ -140,6 +150,12 @@
 
                     $.redirect(target, data);
 
+                }
+                else
+                {
+
+                    alert(data.msg);
+                    
                 }
 
                 return data.msg;
