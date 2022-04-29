@@ -10,11 +10,13 @@ body{
 /*Using this for the title of the web page*/
 h1{
 	font-family: "Roboto", Sans-Serif;
-	font-style: normal;
+	font-stlye: normal;
 	font-weight: normal;
-	font-size: 75px;
-	text-align: center;
-	color: black;
+	font-size: 60px;
+	text-align: justify;
+	position: fixed;
+	top: 20px;
+	left: 500px;
 }
 
 /*This is the different colored rectangle that the colored boxes and information is on top of*/
@@ -121,4 +123,64 @@ h1{
 	text-align: center;
 	font-family: "Roboto", Sans-Serif;
 	font-size: 20px
+}
+
+.hamburgerButton
+{
+	color: black;
+	border: 2px;
+	border-color: grey;
+	position: fixed;
+	width: 130px;
+	height: 30px;
+	padding: 25px;
+	cursor: pointer;
+	z-index: 1;
+}
+
+.MenuLayer
+{
+	background-color: rgba(196, 196, 196, 0.801);
+	height: 100%;
+	width: 0;
+	position: fixed;
+	z-index: 1;
+	top: 0;
+	left: 0;
+	overflow-x: hidden;
+	transition: 0.60s;
+}
+
+.MenuLayerLinks
+{
+	position: relative;
+	bottom: 0px;
+	padding: 35px;
+	width: 100%;
+	text-align: center;
+}
+
+.MenuLayer a
+{
+	padding: 18px;
+	text-decoration: none;
+	font-size: 36px;
+	color: #000000;
+	display: block;
+	transition: 0.3s;
+}
+
+.MenuLayer a:hover, .MenuLayer a:focus
+{
+	color: #f1f1f1;
+}
+
+.MenuLayer a, .employeeText
+{
+padding: 18px;
+text-decoration: none;
+font-size: 36px;
+color: #000000;
+display: block;
+transition: 0.3s;
 }
