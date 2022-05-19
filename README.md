@@ -75,3 +75,15 @@ to listen on.
 Lastly, you may navigate to the index page of our application at the following URL:  
 
 http://<host_name>:<port_number>  
+
+# Login Credentials
+As described in the embedded video, there are two different employee views that employees will be navigated to based on their access level 
+parameter. Since database access is not explicitly provided, they are stated here:
+
+**Employee View User**  
+  Username: admin  
+  Password: admin50  
+  
+**Manager View User:**  
+  Username: admin2  
+  Password: apple  
