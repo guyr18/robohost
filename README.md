@@ -8,6 +8,13 @@ Robert Guy
 Brandon Woods  
 Robert Johnson  
 
+**Demo Video**
+
+
+
+https://user-images.githubusercontent.com/46636441/169212357-c6c7b4f0-8d05-47f9-bd39-14448c81b1dc.mp4
+
+
 This document contains the sequence of steps for running RoboHost locally. It assumes that  
 you are running **Python 3.x**, have **git** installed and have access to a **Linux** shell.
 
